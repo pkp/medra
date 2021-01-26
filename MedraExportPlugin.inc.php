@@ -94,7 +94,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin {
 		// Use a different endpoint for testing and production.
 		// New endpoint: use a different endpoint if the user selects the checkbox to deposit also in Crossref.
 		$crEnabled = false;
-		if ($this->_request->getUserVar('crEnabled') == 'on') $crEnabled = true;
+		if ($this->_request && $this->_request->getUserVar('crEnabled') == 'on') $crEnabled = true;
 
 		$endpoint = ($this->isTestMode($context) ? ($crEnabled ? MEDRA2CR_WS_ENDPOINT_DEV : MEDRA_WS_ENDPOINT_DEV) : ($crEnabled ? MEDRA2CR_WS_ENDPOINT : MEDRA_WS_ENDPOINT));
 
