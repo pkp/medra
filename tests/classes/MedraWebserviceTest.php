@@ -46,7 +46,7 @@ class MedraWebserviceTest extends PKPTestCase {
 	 */
 	public function testUploadWithError() {
 		$metadata = str_replace('SerialVersion', 'UnknownElement', $this->getTestData());
-		$expectedError = "mEDRA: 200 - uploaded file is not valid cvc-complex-type.2.4.a: ".
+		$expectedError = "mEDRA: 500 - uploaded file is not valid: cvc-complex-type.2.4.a: ".
 			"Invalid content was found starting with element 'UnknownElement'. " .
 			"One of '{\"http://www.editeur.org/onix/DOIMetadata/2.0\":SerialVersion}' is expected.";
 		self::assertEquals($expectedError, $this->ws->upload($metadata));
@@ -66,7 +66,7 @@ class MedraWebserviceTest extends PKPTestCase {
 		$result = str_replace(
 			'<NotificationType>07</NotificationType>',
 			'<NotificationType>06</NotificationType>',
-			$this->ws->viewMetadata('1749/t.v1i1')
+			$this->ws->viewMetadata('10.5236/jpkjpk.v1i1')
 		);
 
 		self::assertXmlStringEqualsXmlString($dom->saveXml($elem), $result);
@@ -77,7 +77,7 @@ class MedraWebserviceTest extends PKPTestCase {
 	 * @return string
 	 */
 	private function getTestData() {
-		$sampleFile = './tests/functional/plugins/importexport/medra/serial-issue-as-work.xml';
+		$sampleFile = './plugins/importexport/medra/tests/functional/serial-issue-as-work.xml';
 		return file_get_contents($sampleFile);
 	}
 }

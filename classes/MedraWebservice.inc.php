@@ -154,12 +154,18 @@ class MedraWebservice {
 			$result = 'OJS-mEDRA: Expected ' . MEDRA_WS_RESPONSE_OK . ' response code, got ' . $status . ' instead.';
 		} elseif ($result === true) {
 			$responseContent = $response->getBody()->getContents();
-			$document->loadXml($responseContent);
-			$returnCode = $document->getElementsByTagName('returnCode');
-			$statusCode = $document->getElementsByTagName('statusCode');
-			if (($returnCode->length > 0 && $returnCode->item(0)->textContent != 'success') ||
-				($statusCode->length > 0 && $statusCode->item(0)->textContent != 'SUCCESS')) {
-					$result = $responseContent;
+			if (!$attachment && $action == 'viewMetadata') {
+				$parts = explode("\r\n\r\n", $responseContent);
+				$result = array_pop($parts);
+				$result = PKPString::regexp_replace('/>[^>]*$/', '>', $result);
+			} else {
+				$document->loadXml($responseContent);
+				$returnCode = $document->getElementsByTagName('returnCode');
+				$statusCode = $document->getElementsByTagName('statusCode');
+				if (($returnCode->length > 0 && $returnCode->item(0)->textContent != 'success') ||
+					($statusCode->length > 0 && $statusCode->item(0)->textContent != 'SUCCESS')) {
+						$result = $responseContent;
+				}
 			}
 		}
 		return $result;
