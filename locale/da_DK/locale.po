@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T11:05:41+00:00\n"
-"PO-Revision-Date: 2021-01-29 09:00+0000\n"
+"PO-Revision-Date: 2021-01-30 15:53+0000\n"
 "Last-Translator: Niels Erik Frederiksen <nef@kb.dk>\n"
 "Language-Team: Danish <http://translate.pkp.sfu.ca/projects/plugins/medra/"
 "da_DK/>\n"
@@ -118,3 +118,15 @@ msgstr ""
 
 msgid "plugins.importexport.medra.crossref"
 msgstr "Deponér hos Crossref. (Denne tjeneste skal aktiveres i din konto.)"
+
+msgid "plugins.importexport.medra.crossref.error.description"
+msgstr "BESKRIVELSE"
+
+msgid "plugins.importexport.medra.crossref.error.element"
+msgstr "ELEMENT"
+
+msgid "plugins.importexport.medra.crossref.error.code"
+msgstr "KODE"
+
+msgid "plugins.importexport.medra.crossref.error.details"
+msgstr "Følgende krav blev ikke opfyldt"
