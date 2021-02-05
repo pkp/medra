@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "PO-Revision-Date: 2021-02-06 04:07+0000\n"
-"Last-Translator: Jovan Jonovski <jonovski@hotmail.com>\n"
+"Last-Translator: Teodora Fildishevska <t.fildishevska@gmail.com>\n"
 "Language-Team: Macedonian <http://translate.pkp.sfu.ca/projects/plugins/"
 "medra/mk_MK/>\n"
 "Language: mk_MK\n"
@@ -126,3 +126,30 @@ msgstr "CODE"
 
 msgid "plugins.importexport.medra.crossref.error.number"
 msgstr "Број на грешки"
+
+msgid "plugins.importexport.medra.crossref.error.details"
+msgstr "Следните барања не беа запазени"
+
+msgid "plugins.importexport.medra.crossref.error.cause"
+msgstr ""
+"Причина: датотеката не е валидна во однос на барањата за mEDRA и/или "
+"Crossref."
+
+msgid "plugins.importexport.medra.crossref"
+msgstr ""
+"Депонирај до Crossref. (Оваа услуга мора да биде овозможена за вашата "
+"корисничка сметка.)"
+
+msgid "plugins.importexport.medra.workOrProduct"
+msgstr ""
+"Забелешка: ДОИ доделени на трудови ќе бидат експортирани во mEDRA како <a "
+"href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\""
+">'трудови'</a>.  ДОИ доделени на отисоците ќе бидат експортирани како <a "
+"href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\""
+">'манифестации'</a>."
+
+#, fuzzy
+msgid "plugins.importexport.medra.settings.form.publicationCountry"
+msgstr ""
+"Ве молиме да ја изберете земјата која ќе биде информирана “издавачка земја' "
+"во mEDRA."
