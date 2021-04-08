@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2021-04-01 10:55+0000\n"
+"PO-Revision-Date: 2021-04-09 09:55+0000\n"
 "Last-Translator: Dimitri Gogelia <dimitri.gogelia@iliauni.edu.ge>\n"
 "Language-Team: Georgian <http://translate.pkp.sfu.ca/projects/plugins/medra/"
 "ka_GE/>\n"
@@ -15,7 +15,138 @@ msgid "plugins.importexport.medra.settings.form.username"
 msgstr "მომხმარებლის სახელი"
 
 msgid "plugins.importexport.medra.settings.form.fromCompany"
-msgstr "დაწესებულება"
+msgstr "ორგანიზაცია"
 
 msgid "plugins.importexport.medra.settings.form.fromEmail"
 msgstr "ელფოსტა"
+
+msgid "plugins.importexport.medra.displayName"
+msgstr "mEDRA ექსპორტის/რეგისტრაციის პლაგინი"
+
+msgid "plugins.importexport.medra.description"
+msgstr ""
+"ექსპორტის გამოცემა, სტატიები და გაზქათა მეტამონაცემები Onix– ში DOI (O4DOI) "
+"ფორმატისთვის და DOI– ების რეგისტრაცია mEDRA– ს სარეგისტრაციო სააგენტოში."
+
+msgid "plugins.importexport.medra.intro"
+msgstr ""
+"\n"
+"\t\tთუ გსურთ DOI– ების რეგისტრაცია mEDRA– სთან, გთხოვთ მიჰყევით მითითებებს "
+"აქ\n"
+"\t\t<a href=\"http://www.medra.org/en/guide.htm\" target=\"_blank\">mEDRA "
+"საწყისი გვერდი</a>\n"
+"\t\tმიიღონ მომხმარებლის სახელი და პაროლი. თუ არ გაქვთ საკუთარი მომხმარებლის "
+"სახელი და\n"
+"\t\tთქვენ კვლავ შეძლებთ ექსპორტის გატარებას mEDRA XML ფორმატში (Onix for DOI)"
+"\n"
+"\t\tმაგრამ თქვენ არ შეგიძლიათ დარეგისტრირდეთ თქვენი DOI mEDRA– ს საშუალებით "
+"OJS– ის შიგნიდან. \n"
+"\t\tგთხოვთ გაითვალისწინოთ, რომ პაროლი შეინახება როგორც მარტივი ტექსტი, ანუ "
+"არ არის დაშიფრული\n"
+"\t\tMEDRA-ს სარეგისტრაციო მომსახურების მოთხოვნების შესაბამისად.\n"
+"\t"
+
+msgid "plugins.importexport.medra.settings.form.description"
+msgstr "გთხოვთ, დააყენოთ mEDRA ექსპორტის მოდული:"
+
+msgid "plugins.importexport.medra.settings.form.usernameRequired"
+msgstr ""
+"გთხოვთ, შეიყვანოთ თქვენი MEDRA მომხმარებლის სახელი. მომხმარებლის სახელი "
+"შეიძლება არ შეიცავდეს კოლონებს."
+
+msgid "plugins.importexport.medra.settings.form.registrantName"
+msgstr "MEDRA– ზე რეგისტრირებული დაწესებულების სახელი"
+
+msgid "plugins.importexport.medra.settings.form.registrantNameRequired"
+msgstr "გთხოვთ, შეიყვანოთ დაწესებულება, რომელიც რეგისტრირებულია mEDRA– ზე."
+
+msgid "plugins.importexport.medra.settings.form.fromFields"
+msgstr ""
+"ადამიანი, რომელსაც დაუკავშირდება mEDRA ტექნიკური გამოძიების შემთხვევაში:"
+
+msgid "plugins.importexport.medra.settings.form.fromCompanyRequired"
+msgstr ""
+"გთხოვთ, შეიყვანოთ ის ინსტიტუტი, რომელიც ტექნიკურად პასუხისმგებელია DOI– ს "
+"ექსპორტზე (მაგ. დაწესებულება, რომელიც თქვენს ვებ – სერვერს მასპინძლობს)."
+
+msgid "plugins.importexport.medra.settings.form.fromName"
+msgstr "Საკონტაქტო პირი"
+
+msgid "plugins.importexport.medra.settings.form.fromNameRequired"
+msgstr "გთხოვთ, შეიყვანოთ ტექნიკური საკონტაქტო პირი."
+
+msgid "plugins.importexport.medra.settings.form.fromEmailRequired"
+msgstr "გთხოვთ, შეიყვანოთ სწორი საკონტაქტო ელ.ფოსტა."
+
+msgid "plugins.importexport.medra.settings.form.publicationCountry"
+msgstr ""
+"გთხოვთ, აირჩიოთ ქვეყანა, რომლის შესახებაც უნდა ეცნობოთ MEDRA– ს „"
+"გამომცემლობის ქვეყნად“."
+
+msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
+msgstr ""
+"გთხოვთ, აირჩიოთ, გსურთ ექსპორტის საკითხი, როგორც <a href=\"http://www.medra."
+"org/en/metadata_td.htm\" target=\"_blank\">\"ნამუშევრები\" ან \""
+"მანიფესტაციები\"</a> ."
+
+msgid "plugins.importexport.medra.settings.form.work"
+msgstr "სამსახური"
+
+msgid "plugins.importexport.medra.settings.form.manifestation"
+msgstr "მანიფესტაცია"
+
+msgid "plugins.importexport.medra.settings.form.exportIssuesAs.label"
+msgstr "გამოსცემს ექსპორტს, როგორც"
+
+msgid "plugins.importexport.medra.settings.form.automaticRegistration.description"
+msgstr ""
+"OJS დანიშნულ DOI– ს ავტომატურად დაარეგისტრირებს mEDRA– ს. გთხოვთ "
+"გაითვალისწინოთ, რომ ამას შეიძლება გამოქვეყნებიდან მოკლე დრო დასჭირდეს (მაგ. "
+"დამოკიდებულია თქვენი cronjob– ის კონფიგურაციაზე). თქვენ შეგიძლიათ შეამოწმოთ "
+"ყველა არარეგისტრირებული DOI."
+
+msgid "plugins.importexport.medra.settings.form.testMode.description"
+msgstr ""
+"გამოიყენეთ mEDRA ტესტის API (ტესტირების გარემო) DOI– ს რეგისტრაციისთვის. "
+"გთხოვთ, არ დაგავიწყდეთ ამ პარამეტრის ამოღება წარმოებისთვის."
+
+msgid "plugins.importexport.medra.workOrProduct"
+msgstr ""
+"შენიშვნა: სტატიებზე მინიჭებული DOI ექსპორტირდება MEDRA– ში, როგორც <a href=\""
+"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">„სამუშაოები“</a> "
+". გალერეებისთვის მინიჭებული DOI ექსპორტირდება როგორც <a href=\""
+"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">\"მანიფესტაცია\""
+"</a> ."
+
+msgid "plugins.importexport.medra.senderTask.name"
+msgstr "mEDRA ავტომატური რეგისტრაციის ამოცანა"
+
+msgid "plugins.importexport.medra.crossref"
+msgstr ""
+"ანაბარი Crossref- ში. (ეს სერვისი ჩართული უნდა იყოს თქვენი ანგარიშისთვის.)"
+
+msgid "plugins.importexport.medra.crossref.error.cause"
+msgstr "მიზეზი: ფაილი არასწორია mEDRA და / ან Crossref მოთხოვნების შესაბამისად."
+
+msgid "plugins.importexport.medra.crossref.error.number"
+msgstr "შეცდომების რაოდენობა"
+
+msgid "plugins.importexport.medra.crossref.error.details"
+msgstr "შემდეგი მოთხოვნები არ დაკმაყოფილდა"
+
+msgid "plugins.importexport.medra.crossref.error.code"
+msgstr "CODE"
+
+msgid "plugins.importexport.medra.crossref.error.element"
+msgstr "ELEMENT"
+
+msgid "plugins.importexport.medra.crossref.error.description"
+msgstr "DESCRIPTION"
+
+msgid "plugins.importexport.medra.cliUsage"
+msgstr ""
+"გამოყენება: \n"
+"{$scriptName} {$pluginName} export [xmlFileName] [journal_path] "
+"{issues|articles|galleys} objectId1 [objectId2] ...\n"
+"{$scriptName} {$pluginName} register [journal_path] {issues|articles|galleys}"
+" objectId1 [objectId2] ...\n"
