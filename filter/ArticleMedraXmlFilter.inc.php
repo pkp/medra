@@ -214,7 +214,11 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		// Extent (for article-as-manifestation only)
 		if ($galley && !$galley->getRemoteURL()) {
 			$galleyFile = $galley->getFile();
-			if ($galleyFile) $contentItemNode->appendChild($this->createExtentNode($doc, $galleyFile));
+			if ($galleyFile) {
+				$path = $galleyFile->getData('path');
+				$fileSize = Services::get('file')->fs->getSize($path);
+				$contentItemNode->appendChild($this->createExtentNode($doc, $fileSize));
+			}
 		}
 		// Article Title (mandatory)
 		$titles = $this->getTranslationsByPrecedence($article->getCurrentPublication()->getFullTitles(), $objectLocalePrecedence);

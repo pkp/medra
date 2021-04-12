@@ -206,7 +206,8 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter {
 			$issueGalleys = $issueGalleyDao->getByIssueId($issue->getId());
 			if (!empty($issueGalleys)) {
 				foreach($issueGalleys as $issueGalley) {
-					$journalIssueNode->appendChild($this->createExtentNode($doc, $issueGalley));
+					$fileSize = $issueGalley->getFileSize();
+					$journalIssueNode->appendChild($this->createExtentNode($doc, $fileSize));
 				}
 			}
 		}

@@ -384,21 +384,19 @@ class O4DOIXmlFilter extends NativeExportFilter {
 	/**
 	 * Create an extent node.
 	 * @param $doc DOMDocument
-	 * @param $file PKPFile
+	 * @param $fileSize int
 	 * @return DOMElement
 	 */
-	 function createExtentNode($doc, $file) {
-		 $path = $file->getData('path');
-		 $filesize = Services::get('file')->fs->getSize($path);
-		 $deployment = $this->getDeployment();
-		 $extentNode = $doc->createElementNS($deployment->getNamespace(), 'Extent');
-		 // Extent type
-		 $extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentType', O4DOI_EXTENT_TYPE_FILESIZE));
-		 // Extent value
-		 $extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentValue',  $filesize));
-		 // Extent unit
-		 $extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentUnit',  O4DOI_EXTENT_UNIT_BYTES));
-		 return $extentNode;
+	function createExtentNode($doc, $fileSize) {
+		$deployment = $this->getDeployment();
+		$extentNode = $doc->createElementNS($deployment->getNamespace(), 'Extent');
+		// Extent type
+		$extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentType', O4DOI_EXTENT_TYPE_FILESIZE));
+		// Extent value
+		$extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentValue',  $fileSize));
+		// Extent unit
+		$extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentUnit',  O4DOI_EXTENT_UNIT_BYTES));
+		return $extentNode;
 	 }
 
 	 /**
