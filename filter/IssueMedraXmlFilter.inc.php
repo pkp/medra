@@ -3,8 +3,8 @@
 /**
  * @file plugins/importexport/medra/filter/IssueMedraXmlFilter.inc.php
  *
- * Copyright (c) 2014-2020 Simon Fraser University
- * Copyright (c) 2000-2020 John Willinsky
+ * Copyright (c) 2014-2021 Simon Fraser University
+ * Copyright (c) 2000-2021 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class IssueMedraXmlFilter
@@ -149,19 +149,21 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter {
 			$doi = $relatedSubmission->getStoredPubId('doi');
 			if (!empty($doi)) $relatedSubmissionIds[O4DOI_ID_TYPE_DOI] = $doi;
 			$issueNode->appendChild($this->createRelatedNode($doc, 'Work', O4DOI_RELATION_INCLUDES, $relatedSubmissionIds));
-			// related products:
-			// - includes articles-as-manifestation
 			$galleys = (array) $relatedSubmission->getCurrentPublication()->getData('galleys');
-			foreach ($galleys as $galley) {
-				$galleyProprietaryId = $context->getId() . '-' . $pubObject->getId() . '-' . $relatedSubmission->getId() . '-g' . $galley->getId();
+			$relatedGalleys[$relatedSubmission->getId()] = $galleys;
+			unset($relatedSubmission, $relatedSubmissionIds);
+		}
+		// related products:
+		// - includes articles-as-manifestation
+		foreach ($relatedGalleys as $relatedSubmissionId => $submissionGalleys) {
+			foreach($submissionGalleys as $galley) {
+				$galleyProprietaryId = $context->getId() . '-' . $pubObject->getId() . '-' . $relatedSubmissionId . '-g' . $galley->getId();
 				$relatedGalleyIds = array(O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId);
 				$doi = $galley->getStoredPubId('doi');
 				if (!empty($doi)) $relatedGalleyIds[O4DOI_ID_TYPE_DOI] = $doi;
 				$issueNode->appendChild($this->createRelatedNode($doc, 'Product', O4DOI_RELATION_INCLUDES, $relatedGalleyIds));
 				unset($galley, $relatedGalleyIds);
-
 			}
-			unset($relatedSubmission, $relatedSubmissionIds);
 		}
 
 		return $issueNode;
