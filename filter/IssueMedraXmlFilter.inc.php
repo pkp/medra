@@ -149,19 +149,21 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter {
 			$doi = $relatedSubmission->getStoredPubId('doi');
 			if (!empty($doi)) $relatedSubmissionIds[O4DOI_ID_TYPE_DOI] = $doi;
 			$issueNode->appendChild($this->createRelatedNode($doc, 'Work', O4DOI_RELATION_INCLUDES, $relatedSubmissionIds));
-			// related products:
-			// - includes articles-as-manifestation
 			$galleys = (array) $relatedSubmission->getCurrentPublication()->getData('galleys');
-			foreach ($galleys as $galley) {
-				$galleyProprietaryId = $context->getId() . '-' . $pubObject->getId() . '-' . $relatedSubmission->getId() . '-g' . $galley->getId();
+			$relatedGalleys[$relatedSubmission->getId()] = $galleys;
+			unset($relatedSubmission, $relatedSubmissionIds);
+		}
+		// related products:
+		// - includes articles-as-manifestation
+		foreach ($relatedGalleys as $relatedSubmissionId => $submissionGalleys) {
+			foreach($submissionGalleys as $galley) {
+				$galleyProprietaryId = $context->getId() . '-' . $pubObject->getId() . '-' . $relatedSubmissionId . '-g' . $galley->getId();
 				$relatedGalleyIds = array(O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId);
 				$doi = $galley->getStoredPubId('doi');
 				if (!empty($doi)) $relatedGalleyIds[O4DOI_ID_TYPE_DOI] = $doi;
 				$issueNode->appendChild($this->createRelatedNode($doc, 'Product', O4DOI_RELATION_INCLUDES, $relatedGalleyIds));
 				unset($galley, $relatedGalleyIds);
-
 			}
-			unset($relatedSubmission, $relatedSubmissionIds);
 		}
 
 		return $issueNode;
