@@ -1,12 +1,13 @@
+# Jordi LC <jordi.lacruz@uab.cat>, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T11:05:41+00:00\n"
-"PO-Revision-Date: 2020-03-06 07:53+0000\n"
+"PO-Revision-Date: 2021-08-04 15:04+0000\n"
 "Last-Translator: Jordi LC <jordi.lacruz@uab.cat>\n"
-"Language-Team: Spanish <http://translate.pkp.sfu.ca/projects/ojs/"
-"importexport-medra/es/>\n"
+"Language-Team: Spanish <http://translate.pkp.sfu.ca/projects/plugins/medra/"
+"es_ES/>\n"
 "Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -99,3 +100,27 @@ msgstr "Utilice la API de prueba mEDRA (entorno de prueba) para registrar los DO
 
 msgid "plugins.importexport.medra.senderTask.name"
 msgstr "Tarea de registro automático de mEDRA"
+
+msgid "plugins.importexport.medra.crossref.error.description"
+msgstr "DESCRIPCIÓN"
+
+msgid "plugins.importexport.medra.crossref.error.element"
+msgstr "ELEMENTO"
+
+msgid "plugins.importexport.medra.crossref.error.code"
+msgstr "CÓDIGO"
+
+msgid "plugins.importexport.medra.crossref.error.details"
+msgstr "No se han alcanzado los siguientes requisitos"
+
+msgid "plugins.importexport.medra.crossref.error.number"
+msgstr "Número de errores"
+
+msgid "plugins.importexport.medra.crossref.error.cause"
+msgstr ""
+"Causa: el archivo no es válido con respecto a los requerimientos de mEDRA y/"
+"o Crossref."
+
+msgid "plugins.importexport.medra.crossref"
+msgstr ""
+"Depositar en Crossref (este servicio debe estar habilitado en su cuenta)."
