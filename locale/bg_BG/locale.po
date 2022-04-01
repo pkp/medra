@@ -1,8 +1,21 @@
 # Cyril Kamburov <cc@intermedia.bg>, 2022.
 msgid ""
 msgstr ""
+"PO-Revision-Date: 2022-04-01 09:51+0000\n"
+"Last-Translator: Cyril Kamburov <cc@intermedia.bg>\n"
+"Language-Team: Bulgarian <http://translate.pkp.sfu.ca/projects/plugins/medra/"
+"bg_BG/>\n"
 "Language: bg_BG\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 3.9.1\n"
+
+msgid "plugins.importexport.medra.description"
+msgstr ""
+"Експортиране на метаданни за брой , статия и оформление във формат Onix за "
+"DOI (O4DOI) и регистриране на DOI в агенцията за регистрация на mEDRA."
+
+msgid "plugins.importexport.medra.displayName"
+msgstr "Добавка (плъгин) за mEDRA Експорт/Регистрация"
