@@ -1,7 +1,7 @@
 # Cyril Kamburov <cc@intermedia.bg>, 2022.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-04-01 09:51+0000\n"
+"PO-Revision-Date: 2022-04-03 13:57+0000\n"
 "Last-Translator: Cyril Kamburov <cc@intermedia.bg>\n"
 "Language-Team: Bulgarian <http://translate.pkp.sfu.ca/projects/plugins/medra/"
 "bg_BG/>\n"
@@ -19,3 +19,134 @@ msgstr ""
 
 msgid "plugins.importexport.medra.displayName"
 msgstr "Добавка (плъгин) за mEDRA Експорт/Регистрация"
+
+msgid "plugins.importexport.medra.cliUsage"
+msgstr ""
+"Употреба: \n"
+"{$scriptName} {$pluginName} export [xmlFileName] [journal_path] "
+"{issues|articles|galleys} objectId1 [objectId2] ...\n"
+"{$scriptName} {$pluginName} register [journal_path] {issues|articles|galleys}"
+" objectId1 [objectId2] ...\n"
+
+msgid "plugins.importexport.medra.crossref.error.description"
+msgstr "ОПИСАНИЕ"
+
+msgid "plugins.importexport.medra.crossref.error.element"
+msgstr "ЕЛЕМЕНТ"
+
+msgid "plugins.importexport.medra.crossref.error.code"
+msgstr "КОД"
+
+msgid "plugins.importexport.medra.crossref.error.details"
+msgstr "Не бяха изпълнени следните изисквания"
+
+msgid "plugins.importexport.medra.crossref.error.number"
+msgstr "Брой грешки"
+
+msgid "plugins.importexport.medra.crossref.error.cause"
+msgstr ""
+"Причина: файлът не е валиден по отношение на изискванията на mEDRA и/или "
+"Crossref."
+
+msgid "plugins.importexport.medra.crossref"
+msgstr ""
+"Депозит към Crossref. (Тази услуга трябва да е активирана за вашия акаунт.)"
+
+msgid "plugins.importexport.medra.senderTask.name"
+msgstr "Задача за автоматична регистрация в mEDRA"
+
+msgid "plugins.importexport.medra.workOrProduct"
+msgstr ""
+"NB: DOI, присвоени на статии, ще бъдат експортирани в mEDRA като <a href=\""
+"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'работи - "
+"works'</a>. DOI, присвоени на типографии, ще бъдат експортирани като <a href="
+"\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'изгледи - "
+"manifestations'</a>."
+
+msgid "plugins.importexport.medra.settings.form.testMode.description"
+msgstr ""
+"Използвайте тестовия API на mEDRA (среда за тестване) за регистрация на DOI. "
+"Моля, не забравяйте да премахнете тази опция за работа в реална среда."
+
+msgid "plugins.importexport.medra.settings.form.automaticRegistration.description"
+msgstr ""
+"OJS ще регистрира автоматично присвоени DOI в mEDRA. Моля, имайте предвид, "
+"че това може да отнеме кратко време след публикуването за обработка (напр. в "
+"зависимост от конфигурацията на cronjob). Можете да проверите за всички "
+"нерегистрирани DOI."
+
+msgid "plugins.importexport.medra.settings.form.exportIssuesAs.label"
+msgstr "Експортиране на броеве като"
+
+msgid "plugins.importexport.medra.settings.form.manifestation"
+msgstr "изглед (manifestation)"
+
+msgid "plugins.importexport.medra.settings.form.work"
+msgstr "работа (work)"
+
+msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
+msgstr ""
+"Моля, изберете дали искате да експортирате броеве като <a href=\""
+"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'работи - works' "
+"или 'изгледи - manifestations'</a>."
+
+msgid "plugins.importexport.medra.settings.form.publicationCountry"
+msgstr ""
+"Моля, изберете държавата, която да бъде подадена като „държава на публикация“"
+" към mEDRA."
+
+msgid "plugins.importexport.medra.settings.form.fromEmailRequired"
+msgstr "Моля, въведете валиден имейл за технически контакт."
+
+msgid "plugins.importexport.medra.settings.form.fromEmail"
+msgstr "Имейл"
+
+msgid "plugins.importexport.medra.settings.form.fromNameRequired"
+msgstr "Моля, въведете лице за технически контакт."
+
+msgid "plugins.importexport.medra.settings.form.fromName"
+msgstr "Лице за контакт"
+
+msgid "plugins.importexport.medra.settings.form.fromCompanyRequired"
+msgstr ""
+"Моля, въведете институцията, която е технически отговорна за експортирането "
+"на DOI (напр. институцията, която хоства вашия уеб сървър)."
+
+msgid "plugins.importexport.medra.settings.form.fromCompany"
+msgstr "Институция"
+
+msgid "plugins.importexport.medra.settings.form.fromFields"
+msgstr "Лице, с което mEDRA ще се свърже в случай на технически запитвания:"
+
+msgid "plugins.importexport.medra.settings.form.registrantNameRequired"
+msgstr "Моля, въведете институцията, която е регистрирана в mEDRA."
+
+msgid "plugins.importexport.medra.settings.form.registrantName"
+msgstr "Името на институцията, регистрирана в mEDRA"
+
+msgid "plugins.importexport.medra.settings.form.usernameRequired"
+msgstr ""
+"Моля, въведете вашето потребителско име за mEDRA. Потребителското име не "
+"може да съдържа двоеточия."
+
+msgid "plugins.importexport.medra.settings.form.description"
+msgstr "Моля, конфигурирайте mEDRA добавката (плъгин) за експортиране:"
+
+msgid "plugins.importexport.medra.intro"
+msgstr ""
+"\n"
+"\t\tАко искате да регистрирате DOI с mEDRA, моля, следвайте указанията на\n"
+"\t\t<a href=\"http://www.medra.org/en/guide.htm\" target=\"_blank\">"
+"страницата на mEDRA</a>\n"
+"\t\tза да получите потребителско име и парола. Ако нямате собствено "
+"потребителско име и\n"
+"\t\tпарола, която все още ще можете да експортирате във формат mEDRA XML ("
+"Onix за DOI)\n"
+"\t\tно не можете да регистрирате вашите DOI с mEDRA от OJS. \n"
+"\t\tМоля, имайте предвид, че паролата ще бъде запазена като обикновен текст, "
+"т.е. не е криптирана, поради\n"
+"\t\tизискванията на услугата за регистрация на mEDRA.\n"
+"\t"
+
+msgid "plugins.importexport.medra.settings.form.username"
+msgstr "Потребител"
