@@ -2,7 +2,7 @@
 # Tigran Zargaryan <tigran@flib.sci.am>, 2022.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-07-04 06:31+0000\n"
+"PO-Revision-Date: 2022-08-05 23:36+0000\n"
 "Last-Translator: Tigran Zargaryan <tigran@flib.sci.am>\n"
 "Language-Team: Armenian <http://translate.pkp.sfu.ca/projects/plugins/medra/"
 "hy_AM/>\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 3.9.1\n"
+"X-Generator: Weblate 4.13.1\n"
 
 msgid "plugins.importexport.medra.cliUsage"
 msgstr ""
@@ -42,7 +42,7 @@ msgstr "Պատճառը. նիշքը վավեր չէ mEDRA-ի և/կամ Crossref-�
 msgid "plugins.importexport.medra.crossref"
 msgstr ""
 "Ավանդադրեք Crossref-ում: (Այս ծառայությունը պետք է միացված լինի ձեր հաշվի "
-"համար):"
+"համար:)"
 
 msgid "plugins.importexport.medra.senderTask.name"
 msgstr "mEDRA ինքնաշխատ գրանցման առաջադրանք"
@@ -108,7 +108,7 @@ msgid "plugins.importexport.medra.settings.form.fromCompany"
 msgstr "Հաստատություն"
 
 msgid "plugins.importexport.medra.settings.form.fromFields"
-msgstr "Տեխնիկական հարցումների դեպքում mEDRA-ի հետ կապ հաստատող անձ."
+msgstr "Տեխնիկական հարցումների դեպքում mEDRA-ի հետ կապ հաստատող անձ:"
 
 msgid "plugins.importexport.medra.settings.form.registrantNameRequired"
 msgstr "Խնդրում ենք մուտքագրել այն հաստատությունը, որը գրանցված է mEDRA-ում:"
@@ -125,7 +125,7 @@ msgid "plugins.importexport.medra.settings.form.username"
 msgstr "Օգտանուն"
 
 msgid "plugins.importexport.medra.settings.form.description"
-msgstr "Խնդրում ենք կարգավորել mEDRA արտահանման հավելվածը."
+msgstr "Խնդրում ենք կարգավորել mEDRA արտահանման հավելվածը:"
 
 msgid "plugins.importexport.medra.intro"
 msgstr ""
