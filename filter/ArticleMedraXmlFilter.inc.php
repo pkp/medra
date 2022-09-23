@@ -144,6 +144,51 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			$url = PKPString::regexp_replace('#://[^\s]+/index.php#', '://example.com/index.php', $url);
 		}
 		$articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIWebsiteLink', $url));
+
+		// Adding Collection on the content 
+		//Collection property="crawler-based"
+		$galleys = $article->getCurrentPublication()->getData('galleys');
+		// All full-texts, PDF full-texts and remote galleys for text-mining and as-crawled URL
+		$submissionGalleys = $pdfGalleys = $remoteGalleys = array();
+		// preferred PDF full-text for the as-crawled URL
+		$pdfGalleyInArticleLocale = null;
+		$genreDao = DAORegistry::getDAO('GenreDAO'); /* @var $genreDao GenreDAO */
+		foreach ($galleys as $gal) {
+			if (!$gal->getRemoteURL()) {
+				$galleyFile = $gal->getFile();
+				if ($galleyFile) {
+					$genre = $genreDao->getById($galleyFile->getGenreId());
+					if (!$genre->getSupplementary()) {
+						$submissionGalleys[] = $gal;
+						if ($gal->isPdfGalley()) {
+							$pdfGalleys[] = $gal;
+							if (!$pdfGalleyInArticleLocale && $gal->getLocale() == $locale) {
+								$pdfGalleyInArticleLocale = $gal;
+							}
+						}
+					}
+				}
+			} else {
+				$remoteGalleys[] = $gal;
+			}
+		}	
+			
+		// as-crawled URLs
+		$asCrawledGalleys = array();
+		if ($pdfGalleyInArticleLocale) {
+			$asCrawledGalleys = array($pdfGalleyInArticleLocale);
+		} elseif (!empty($pdfGalleys)) {
+			$asCrawledGalleys = array($pdfGalleys[0]);
+		} else {
+			$asCrawledGalleys = $submissionGalleys;
+		}
+
+		$this->appendAsCrawledCollectionNodes($doc, $deployment, $request, $context, $articleNode, $article, $asCrawledGalleys);
+		
+		// text-mining - collection nodes
+		$submissionGalleys = array_merge($submissionGalleys, $remoteGalleys);
+		$this->appendTextMiningCollectionNodes($doc, $deployment, $request, $context, $articleNode, $article, $submissionGalleys);
+
 		// DOI strucural type
 		$articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIStructuralType', $this->getDOIStructuralType()));
 		// Registrant (mandatory)
@@ -331,6 +376,14 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			}
 
 		}
+		//Adding Citation List (unstructured) on the content
+		$citationDao = DAORegistry::getDAO('CitationDAO'); /* @var $citationDao CitationDAO */
+		$parsedCitations = $citationDao->getByPublicationId($article->getId());
+		//$parsedCitations = $citationDao->getBySubmissionId($article->getId())->toArray();
+		if(!is_null($parsedCitations) && !empty($parsedCitations)){
+			$this->appendCitationListNodes($doc, $deployment, $contentItemNode, $article, $parsedCitations);
+		}
+		
 		return $contentItemNode;
 	}
 
@@ -411,6 +464,89 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			$subjectNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SubjectCode', htmlspecialchars($subjectHeadingOrCode, ENT_COMPAT, 'UTF-8')));
 		}
 		return $subjectNode;
+	}
+
+	/**
+	 * Append the collection node 'collection property="crawler-based"' to the Article/Issue data node.
+	 * @param $doc DOMDocument
+	 * @param $deployment Deployment
+	 * @param $request Request
+	 * @param $context Context
+	 * @param $crawlableDataNode DOMElement
+	 * @param $article Article/Issue
+	 * @param $galleys array of galleys
+	 */
+	function appendAsCrawledCollectionNodes($doc, $deployment, $request, $context, $crawlableDataNode, $article, $galleys) {
+
+		foreach ($galleys as $crawledGalley) {
+			// loop through values 
+			// as-crawled URL - collection nodes
+		   $urlPath_ = array($article->getBestArticleId(), $crawledGalley->getBestGalleyId());
+		   $resourceURL_ = $request->url($context->getPath(), 'article', 'view', $urlPath_, null, null, true);
+		   // iParadigms crawler based collection element
+		   if($resourceURL_){
+			   $crawlerBasedCollectionNode = $doc->createElementNS($deployment->getNamespace(), 'Collection');
+			   $crawlerBasedCollectionNode->setAttribute('property', 'crawler-based');
+			   $iParadigmsItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
+			   $iParadigmsItemNode->setAttribute('crawler', 'iParadigms');
+			   $iParadigmsItemNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL_)));
+			   $crawlerBasedCollectionNode->appendChild($iParadigmsItemNode);
+			   $crawlableDataNode->appendChild($crawlerBasedCollectionNode);
+		   }
+	   }
+	}
+
+	/**
+	 * Append the collection node 'collection property="text-mining"' to the Article/Issue data node.
+	 * @param $doc DOMDocument
+	 * @param $deployment Deployment
+	 * @param $request Request
+	 * @param $context Context
+	 * @param $textMiningCollectionDataNode DOMElement
+	 * @param $article Article
+	 * @param $galleys array of galleys
+	 */
+	function appendTextMiningCollectionNodes($doc, $deployment, $request, $context, $textMiningCollectionDataNode, $article, $galleys) {
+
+		foreach ($galleys as $submissionGalley) {
+			$textMiningCollectionNode = $doc->createElementNS($deployment->getNamespace(), 'Collection');
+			$textMiningCollectionNode->setAttribute('property', 'text-mining');
+			$urlPath__ = array($article->getBestArticleId(), $submissionGalley->getBestGalleyId());
+			$resourceURL__ = $request->url($context->getPath(), 'article', 'view', $urlPath__, null, null, true);
+			// iParadigms text-mining based collection element
+			if($resourceURL__){
+				// text-mining collection item
+				$textMiningItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
+				$resourceNode = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL__));
+				if (!$submissionGalley->getRemoteURL()) $resourceNode->setAttribute('mime_type', $submissionGalley->getFileType());
+				$textMiningItemNode->appendChild($resourceNode);
+				$textMiningCollectionNode->appendChild($textMiningItemNode);
+				$textMiningCollectionDataNode->appendChild($textMiningCollectionNode);
+			}
+		}
+	}
+
+	/**
+	 * Append the Citations node 'Citations unstructured' to the ContentItem data node.
+	 * @param $doc DOMDocument
+	 * @param $deployment Deployment
+	 * @param $contentItemNode DOMElement
+	 * @param $article Article
+	 * @param $parsedCitations array of Citations
+	 */
+	function appendCitationListNodes($doc, $deployment, $contentItemNode, $article, $parsedCitations) {
+
+		$citationListNode = $doc->createElementNS($deployment->getNamespace(), 'cl:CitationList');
+		$citationListNode->setAttributeNS('http://www.w3.org/2000/xmlns/' ,'xmlns:cl', 'http://www.medra.org/DOIMetadata/2.0/Citations');
+		foreach($parsedCitations as $citation) {
+			$articleCitationNode = $doc->createElementNS('http://www.medra.org/DOIMetadata/2.0/Citations', 'ArticleCitation');
+			$articleCitationNode->setAttribute('key', $article->getStoredPubId('doi') . '_ref' . $citation->getData('seq'));
+			$unstructuredCitationNode = $doc->createElementNS('http://www.medra.org/DOIMetadata/2.0/Citations', 'UnstructuredCitation');
+			$unstructuredCitationNode->appendChild($doc->createTextNode($citation->getData('rawCitation')));
+			$articleCitationNode->appendChild($unstructuredCitationNode);
+			$citationListNode->appendChild($articleCitationNode);
+			$contentItemNode->appendChild($citationListNode);
+		}
 	}
 
 }
