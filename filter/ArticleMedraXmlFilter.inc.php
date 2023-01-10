@@ -137,13 +137,61 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOI', htmlspecialchars($doi, ENT_COMPAT, 'UTF-8')));
 		// DOI URL (mandatory)
 		$urlPath = $article->getBestId();
-		if ($galley) $urlPath = array($article->getBestId(), $galley->getBestGalleyId());
+		if ($galley) $urlPath = [$article->getBestId(), $galley->getBestGalleyId()];
 		$url = $router->url($request, $context->getPath(), 'article', 'view', $urlPath, null, null, true);
 		if ($plugin->isTestMode($context)) {
 			// Change server domain for testing.
 			$url = PKPString::regexp_replace('#://[^\s]+/index.php#', '://example.com/index.php', $url);
 		}
 		$articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIWebsiteLink', $url));
+
+		// Add Collection on the content
+		// Collection property="crawler-based"
+		$galleysForCollection = $article->getCurrentPublication()->getData('galleys');
+		// All full-texts, PDF full-texts and remote galleys for text-mining and as-crawled URL
+		$submissionGalleys = $pdfGalleys = $remoteGalleys = [];
+		// preferred PDF full-text for the as-crawled URL
+		$pdfGalleyInArticleLocale = null;
+		$genreDao = DAORegistry::getDAO('GenreDAO'); /* @var $genreDao GenreDAO */
+		foreach ($galleysForCollection as $galleyForCollection) {
+			if (!$galleyForCollection->getRemoteURL()) {
+				$galleyForCollectionFile = $galleyForCollection->getFile();
+				if ($galleyForCollectionFile) {
+					$genre = $genreDao->getById($galleyForCollectionFile->getGenreId());
+					if (!$genre->getSupplementary()) {
+						$submissionGalleys[] = $galleyForCollection;
+						if ($galleyForCollection->isPdfGalley()) {
+							$pdfGalleys[] = $galleyForCollection;
+							if (!$pdfGalleyInArticleLocale && $galleyForCollection->getLocale() == $article->getCurrentPublication()->getData('locale')) {
+								$pdfGalleyInArticleLocale = $galleyForCollection;
+							}
+						}
+					}
+				}
+			} else {
+				$remoteGalleys[] = $galleyForCollection;
+			}
+		}
+
+		// as-crawled URLs
+		$asCrawledGalleys = [];
+		if ($pdfGalleyInArticleLocale) {
+			$asCrawledGalleys = [$pdfGalleyInArticleLocale];
+		} elseif (!empty($pdfGalleys)) {
+			$asCrawledGalleys = [$pdfGalleys[0]];
+		} else {
+			$asCrawledGalleys = $submissionGalleys;
+		}
+		// as-crawled URL collection node
+		if (!empty($asCrawledGalleys)) {
+			$this->appendAsCrawledCollectionNodes($doc, $articleNode, $article, $asCrawledGalleys);
+		}
+		// text-mining collection node
+		$submissionGalleys = array_merge($submissionGalleys, $remoteGalleys);
+		if (!empty($submissionGalleys)) {
+			$this->appendTextMiningCollectionNodes($doc, $articleNode, $article, $submissionGalleys);
+		}
+
 		// DOI strucural type
 		$articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIStructuralType', $this->getDOIStructuralType()));
 		// Registrant (mandatory)
@@ -271,7 +319,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			$issueWorkOrProduct = 'Product';
 		}
 		$issueProprietaryId = $context->getId() . '-' . $issue->getId();
-		$relatedIssueIds = array(O4DOI_ID_TYPE_PROPRIETARY => $issueProprietaryId);
+		$relatedIssueIds = [O4DOI_ID_TYPE_PROPRIETARY => $issueProprietaryId];
 		$issueDoi = $issue->getStoredPubId('doi');
 		if (!empty($issueDoi)) $relatedIssueIds[O4DOI_ID_TYPE_DOI] = $issueDoi;
 		$relatedIssueNode = $this->createRelatedNode($doc, $issueWorkOrProduct, O4DOI_RELATION_IS_PART_OF, $relatedIssueIds);
@@ -283,7 +331,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			// - is manifested in articles-as-manifestation
 			foreach($galleysByArticle as $relatedGalley) {
 				$galleyProprietaryId = $context->getId() . '-' . $issue->getId() . '-' . $article->getId() . '-g' . $relatedGalley->getId();
-				$relatedGalleyIds = array(O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId);
+				$relatedGalleyIds = [O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId];
 				$galleyDoi = $relatedGalley->getStoredPubId('doi');
 				if (!empty($galleyDoi)) $relatedGalleyIds[O4DOI_ID_TYPE_DOI] = $galleyDoi;
 				$contentItemNode->appendChild($this->createRelatedNode($doc, 'Product', O4DOI_RELATION_IS_MANIFESTED_IN, $relatedGalleyIds));
@@ -296,7 +344,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			// related work:
 			// - is a manifestation of article-as-work
 			$articleProprietaryId = $context->getId() . '-' . $article->getCurrentPublication()->getData('issueId') . '-' . $article->getId();
-			$relatedArticleIds = array(O4DOI_ID_TYPE_PROPRIETARY => $articleProprietaryId);
+			$relatedArticleIds = [O4DOI_ID_TYPE_PROPRIETARY => $articleProprietaryId];
 			$doi = $article->getCurrentPublication()->getStoredPubId('doi');
 			if (!empty($doi)) $relatedArticleIds[O4DOI_ID_TYPE_DOI] = $doi;
 			$contentItemNode->appendChild($this->createRelatedNode($doc, 'Work', O4DOI_RELATION_IS_A_MANIFESTATION_OF, $relatedArticleIds));
@@ -308,7 +356,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			// related products:
 			foreach($galleysByArticle as $relatedGalley) {
 				$galleyProprietaryId = $context->getId() . '-' . $issue->getId() . '-' . $article->getId() . '-g' . $relatedGalley->getId();
-				$relatedGalleyIds = array(O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId);
+				$relatedGalleyIds = [O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId];
 				$galleyDoi = $relatedGalley->getStoredPubId('doi');
 				if (!empty($galleyDoi)) $relatedGalleyIds[O4DOI_ID_TYPE_DOI] = $galleyDoi;
 
@@ -331,6 +379,13 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			}
 
 		}
+		// Add citation list (unstructured)
+		$citationDao = DAORegistry::getDAO('CitationDAO'); /* @var $citationDao CitationDAO */
+		$parsedCitations = $citationDao->getByPublicationId($article->getCurrentPublication()->getId())->toArray();
+		if(!empty($parsedCitations)){
+			$this->appendCitationListNodes($doc, $contentItemNode, $article, $parsedCitations);
+		}
+
 		return $contentItemNode;
 	}
 
@@ -411,6 +466,80 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			$subjectNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SubjectCode', htmlspecialchars($subjectHeadingOrCode, ENT_COMPAT, 'UTF-8')));
 		}
 		return $subjectNode;
+	}
+
+	/**
+	 * Append the collection node 'Collection property="crawler-based"' to the Article data node.
+	 * @param $doc DOMDocument
+	 * @param $articleNode DOMElement
+	 * @param $article Article
+	 * @param $galleys array of galleys
+	 */
+	function appendAsCrawledCollectionNodes($doc, $articleNode, $article, $galleys) {
+		$deployment = $this->getDeployment();
+		$context = $deployment->getContext();
+		$request = Application::get()->getRequest();
+
+		$crawlerBasedCollectionNode = $doc->createElementNS($deployment->getNamespace(), 'Collection');
+		$crawlerBasedCollectionNode->setAttribute('property', 'crawler-based');
+		foreach ($galleys as $crawledGalley) {
+			$urlPath = [$article->getBestArticleId(), $crawledGalley->getBestGalleyId()];
+			$resourceURL = $request->url($context->getPath(), 'article', 'download', $urlPath, null, null, true);
+			$iParadigmsItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
+			$iParadigmsItemNode->setAttribute('crawler', 'iParadigms');
+			$iParadigmsItemNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL)));
+			$crawlerBasedCollectionNode->appendChild($iParadigmsItemNode);
+		}
+		$articleNode->appendChild($crawlerBasedCollectionNode);
+	}
+
+	/**
+	 * Append the collection node 'Collection property="text-mining"' to the Article data node.
+	 * @param $doc DOMDocument
+	 * @param $articleNode DOMElement
+	 * @param $article Article
+	 * @param $galleys array of galleys
+	 */
+	function appendTextMiningCollectionNodes($doc, $articleNode, $article, $galleys) {
+		$deployment = $this->getDeployment();
+		$context = $deployment->getContext();
+		$request = Application::get()->getRequest();
+
+		$textMiningCollectionNode = $doc->createElementNS($deployment->getNamespace(), 'Collection');
+		$textMiningCollectionNode->setAttribute('property', 'text-mining');
+		foreach ($galleys as $galley) {
+			$urlPath = [$article->getBestArticleId(), $galley->getBestGalleyId()];
+			$resourceURL = $request->url($context->getPath(), 'article', 'download', $urlPath, null, null, true);
+			$textMiningItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
+			$resourceNode = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL));
+			if (!$galley->getRemoteURL()) $resourceNode->setAttribute('mime_type', $galley->getFileType());
+			$textMiningItemNode->appendChild($resourceNode);
+			$textMiningCollectionNode->appendChild($textMiningItemNode);
+		}
+		$articleNode->appendChild($textMiningCollectionNode);
+	}
+
+	/**
+	 * Append the CitationList node with unstructured citations to the ContentItem data node.
+	 * @param $doc DOMDocument
+	 * @param $contentItemNode DOMElement
+	 * @param $article Article
+	 * @param $parsedCitations array of Citations
+	 */
+	function appendCitationListNodes($doc, $contentItemNode, $article, $parsedCitations) {
+		$deployment = $this->getDeployment();
+		$medraCitationNamespace = 'http://www.medra.org/DOIMetadata/2.0/Citations';
+		$citationListNode = $doc->createElementNS($deployment->getNamespace(), 'cl:CitationList');
+		$citationListNode->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cl', $medraCitationNamespace);
+		foreach($parsedCitations as $citation) {
+			$articleCitationNode = $doc->createElementNS($medraCitationNamespace, 'ArticleCitation');
+			$articleCitationNode->setAttribute('key', $article->getCurrentPublication()->getData('pub-id::doi') . '_ref' . $citation->getData('seq'));
+			$unstructuredCitationNode = $doc->createElementNS($medraCitationNamespace, 'UnstructuredCitation');
+			$unstructuredCitationNode->appendChild($doc->createTextNode($citation->getData('rawCitation')));
+			$articleCitationNode->appendChild($unstructuredCitationNode);
+			$citationListNode->appendChild($articleCitationNode);
+		}
+		$contentItemNode->appendChild($citationListNode);
 	}
 
 }
