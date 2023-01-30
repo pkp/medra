@@ -1,0 +1,150 @@
+# Studiorimau <studiorimau@gmail.com>, 2021.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2021-10-26 08:07+0000\n"
+"Last-Translator: Studiorimau <studiorimau@gmail.com>\n"
+"Language-Team: Malay <http://translate.pkp.sfu.ca/projects/plugins/medra/ms/>"
+"\n"
+"Language: ms\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 3.9.1\n"
+
+msgid "plugins.importexport.medra.cliUsage"
+msgstr ""
+"Penggunaan:\n"
+"{$scriptName} {$pluginName} eksport [xmlFileName] [journal_path] {issue "
+"|articles|galleys} objectId1 [objectId2] ...\n"
+"{$scriptName} {$pluginName} daftar [journal_path] {issue |articles|galleys} "
+"objectId1 [objectId2] ...\n"
+
+msgid "plugins.importexport.medra.crossref.error.description"
+msgstr "BUTIRAN"
+
+msgid "plugins.importexport.medra.crossref.error.element"
+msgstr "ELEMEN"
+
+msgid "plugins.importexport.medra.crossref.error.code"
+msgstr "CODE"
+
+msgid "plugins.importexport.medra.crossref.error.details"
+msgstr "Keperluan berikut tidak dipenuhi"
+
+msgid "plugins.importexport.medra.crossref.error.number"
+msgstr "Bilangan ralat"
+
+msgid "plugins.importexport.medra.crossref.error.cause"
+msgstr ""
+"Sebab: fail tidak sah kerana tidak memenuhi keperluan mEDRA dan/atau "
+"Crossref."
+
+msgid "plugins.importexport.medra.crossref"
+msgstr ""
+"Deposit ke Crossref. (Perkhidmatan ini mesti didayakan untuk akaun anda.)"
+
+msgid "plugins.importexport.medra.senderTask.name"
+msgstr "tugas pendaftaran automatik mEDRA"
+
+msgid "plugins.importexport.medra.workOrProduct"
+msgstr ""
+"NB: DOI yang ditugaskan untuk artikel akan dieksport ke mEDRA sebagai <a "
+"href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\"> 'karya' "
+"</a>. DOI yang ditugaskan ke galley akan dieksport sebagai <a href=\""
+"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\"> 'manifestasi' "
+"</a>."
+
+msgid "plugins.importexport.medra.settings.form.testMode.description"
+msgstr ""
+"Gunakan API ujian mEDRA (testing environment) untuk pendaftaran DOI. Jangan "
+"lupa untuk membuang pilihan ini untuk produksi."
+
+msgid "plugins.importexport.medra.settings.form.automaticRegistration.description"
+msgstr ""
+"OJS akan mendaftarkan DOI yang ditugaskan secara automatik ke mEDRA. Harap "
+"maklum bahawa proses ini mungkin memerlukan sedikit masa selepas penerbitan ("
+"mis. Bergantung pada konfigurasi cronjob anda). Anda boleh memeriksa semua "
+"DOI yang tidak berdaftar."
+
+msgid "plugins.importexport.medra.settings.form.exportIssuesAs.label"
+msgstr "Eksport terbitan sebagai"
+
+msgid "plugins.importexport.medra.settings.form.manifestation"
+msgstr "manifestasi"
+
+msgid "plugins.importexport.medra.settings.form.work"
+msgstr "karya"
+
+msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
+msgstr ""
+"Pilih sama ada anda mahu mengeksport terbitan sebagai <a href=\""
+"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\"> 'karya' atau "
+"'manifestasi' </a>."
+
+msgid "plugins.importexport.medra.settings.form.publicationCountry"
+msgstr "Pilih negara yang akan diberitahu sebagai 'negara penerbitan' ke mEDRA."
+
+msgid "plugins.importexport.medra.settings.form.fromEmailRequired"
+msgstr "Sila masukkan e-mel hubungan teknikal yang sah."
+
+msgid "plugins.importexport.medra.settings.form.fromEmail"
+msgstr "E-mel"
+
+msgid "plugins.importexport.medra.settings.form.fromNameRequired"
+msgstr "Sila masukkan orang hubungan teknikal."
+
+msgid "plugins.importexport.medra.settings.form.fromName"
+msgstr "Sila Hubungi"
+
+msgid "plugins.importexport.medra.settings.form.fromCompanyRequired"
+msgstr ""
+"Sila masukkan institusi yang secara teknikal bertanggungjawab untuk eksport "
+"DOI (mis. Institusi yang menghoskan pelayan web anda)."
+
+msgid "plugins.importexport.medra.settings.form.fromCompany"
+msgstr "Institusi"
+
+msgid "plugins.importexport.medra.settings.form.fromFields"
+msgstr "Orang yang akan dihubungi oleh mEDRA sekiranya ada pertanyaan teknikal:"
+
+msgid "plugins.importexport.medra.settings.form.registrantNameRequired"
+msgstr "Sila masukkan institusi yang didaftarkan di mEDRA."
+
+msgid "plugins.importexport.medra.settings.form.registrantName"
+msgstr "Nama institusi yang didaftarkan di mEDRA"
+
+msgid "plugins.importexport.medra.settings.form.usernameRequired"
+msgstr ""
+"Sila masukkan nama pengguna mEDRA anda. Nama pengguna mungkin tidak "
+"mengandungi kolon."
+
+msgid "plugins.importexport.medra.settings.form.username"
+msgstr "Nama pengguna"
+
+msgid "plugins.importexport.medra.settings.form.description"
+msgstr "Sila konfigurasikan plugin eksport mEDRA:"
+
+msgid "plugins.importexport.medra.intro"
+msgstr ""
+"\n"
+"\t\tSekiranya anda ingin mendaftarkan DOI dengan mEDRA, ikuti arahan di\n"
+"\t\t<a href=\"http://www.medra.org/en/guide.htm\" target=\"_blank\"> laman "
+"utama mEDRA </a>\n"
+"\t\tuntuk menerima nama pengguna dan kata laluan. Sekiranya anda tidak "
+"mempunyai nama pengguna anda sendiri dan\n"
+"\t\tkata laluan anda masih dapat dieksport ke dalam format XML mEDRA (Onix "
+"untuk DOI)\n"
+"\t\ttetapi anda tidak dapat mendaftar DOI anda dengan mEDRA dari dalam OJS.\n"
+"\t\tHarap maklum bahawa kata laluan akan disimpan sebagai teks biasa, kerana "
+"tidak disulitkan\n"
+"\t\tkepada keperluan perkhidmatan pendaftaran mEDRA.\n"
+"\t"
+
+msgid "plugins.importexport.medra.description"
+msgstr ""
+"Eksport terbitan, artikel dan metadata galley dalam format Onix untuk DOI "
+"(O4DOI) dan daftarkan DOI dengan agensi pendaftaran mEDRA."
+
+msgid "plugins.importexport.medra.displayName"
+msgstr "Plugin Eksport/Pendaftaran mEDRA"

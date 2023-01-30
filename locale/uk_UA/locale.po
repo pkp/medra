@@ -1,12 +1,13 @@
+# Petro Bilous <petrobilous@ukr.net>, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T11:05:42+00:00\n"
-"PO-Revision-Date: 2020-04-18 20:21+0000\n"
-"Last-Translator: Fylypovych Georgii <red.ukr@gmail.com>\n"
-"Language-Team: Ukrainian <http://translate.pkp.sfu.ca/projects/ojs/"
-"importexport-medra/uk/>\n"
+"PO-Revision-Date: 2022-02-22 11:06+0000\n"
+"Last-Translator: Petro Bilous <petrobilous@ukr.net>\n"
+"Language-Team: Ukrainian <http://translate.pkp.sfu.ca/projects/plugins/medra/"
+"uk_UA/>\n"
 "Language: uk_UA\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -107,3 +108,26 @@ msgstr ""
 "{$scriptName} {$pluginName} export [xmlFileName] [journal_path] {issues|articles|galleys} objectId1 [objectId2] ...\n"
 "{$scriptName} {$pluginName} register [journal_path] {issues|articles|galleys} objectId1 [objectId2] ...\n"
 ""
+
+msgid "plugins.importexport.medra.crossref.error.description"
+msgstr "ОПИС"
+
+msgid "plugins.importexport.medra.crossref.error.element"
+msgstr "ЕЛЕМЕНТ"
+
+msgid "plugins.importexport.medra.crossref.error.code"
+msgstr "КОД"
+
+msgid "plugins.importexport.medra.crossref.error.details"
+msgstr "Не було дотримано таких вимог"
+
+msgid "plugins.importexport.medra.crossref.error.number"
+msgstr "Кількість помилок"
+
+msgid "plugins.importexport.medra.crossref.error.cause"
+msgstr "Причина: файл не відповідає вимогам mEDRA та/або Crossref."
+
+msgid "plugins.importexport.medra.crossref"
+msgstr ""
+"Депонувати в Crossref. (Цей сервіс має бути включений у вашому обліковому "
+"записі.)"
