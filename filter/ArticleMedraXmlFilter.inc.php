@@ -269,13 +269,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			}
 		}
 		// Article Title (mandatory)
-		$titles = $this->getTranslationsByPrecedence(
-			array_map(
-				fn($pubTitle) => htmlspecialchars($pubTitle, ENT_COMPAT, 'UTF-8'), 
-				$article->getCurrentPublication()->getFullTitles('html')
-			), 
-			$objectLocalePrecedence
-		);
+		$titles = $this->getTranslationsByPrecedence($article->getCurrentPublication()->getFullTitles(), $objectLocalePrecedence);
 		assert(!empty($titles));
 		foreach ($titles as $locale => $title) {
 			$contentItemNode->appendChild($this->createTitleNode($doc, $locale, $title, O4DOI_TITLE_TYPE_FULL));
