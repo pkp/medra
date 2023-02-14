@@ -19,13 +19,13 @@ Same requirements as for the OJS 3.3 core.
 
 Installation
 ------------
-Use the Plugin Gallery from within your PKP application to install the plugin. For further information refer to [PKP|DOCS](https://docs.pkp.sfu.ca/orcid/en/installation-setup).
+Use the Plugin Gallery from within your PKP application to install the plugin.
 
 Note
 ---------
 In order to use the export into the ONIX4DOI XML format you will need to setup the plugin i.e. to enter the required information.
 To register DOIs with mEDRA from within OJS you will have to enter your username and password.
-If you do not enter or have your own username and password you'll still be able to export into the 
+If you do not enter or have your own username and password you'll still be able to export into the
 ONIX4DOI XML format but you cannot register your DOIs from within OJS.
 Please note, that the passowrd will be saved as plain text, i.e. not encrypted, due to mEDRA registration service requirements.
 To use the additional possibility to deposit the DOIs also with the Crossref, this mEDRA service will have to be enabled for your account.
@@ -33,7 +33,10 @@ If the automatic deposit option (in plugin settings) is selected, the mEDRA serv
 
 Version History
 ---------------
-3.0	- Plugin moved to its own repository and provided via Plugin Gallery
+3.0.0.3 - iParadigms crawler and text-mining collection element, and unstructured citation list added for OJS 3.3.0-14
+3.0.0.2 - But fix for OJS 3.3.0-6
+3.0.0.1 - But fix for OJS 3.3.0-5
+3.0.0.0 - Plugin moved to its own repository and provided via Plugin Gallery
 
 Contact/Support
 ---------------
