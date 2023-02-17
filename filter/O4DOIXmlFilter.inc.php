@@ -202,7 +202,7 @@ class O4DOIXmlFilter extends NativeExportFilter {
 	/**
 	 * Create a title node.
 	 * @param $doc DOMDocument
-	 * @param $locale string e.g. 'en_US'
+	 * @param $locale string e.g. 'en'
 	 * @param $localizedTitle string
 	 * @param $titleType string One of the O4DOI_TITLE_TYPE_* constants.
 	 * @return DOMElement
