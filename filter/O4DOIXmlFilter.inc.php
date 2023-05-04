@@ -205,9 +205,10 @@ class O4DOIXmlFilter extends NativeExportFilter {
 	 * @param $locale string e.g. 'en_US'
 	 * @param $localizedTitle string
 	 * @param $titleType string One of the O4DOI_TITLE_TYPE_* constants.
+	 * @param $localizedSubtitle string optional
 	 * @return DOMElement
 	 */
-	function createTitleNode($doc, $locale, $localizedTitle, $titleType) {
+	function createTitleNode($doc, $locale, $localizedTitle, $titleType, $localizedSubtitle = null) {
 		$deployment = $this->getDeployment();
 		$titleNode = $doc->createElementNS($deployment->getNamespace(), 'Title');
 		// Text format
@@ -220,6 +221,10 @@ class O4DOIXmlFilter extends NativeExportFilter {
 		$titleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'TitleType', $titleType));
 		// Title text (mandatory)
 		$titleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'TitleText', htmlspecialchars(PKPString::html2text($localizedTitle), ENT_COMPAT, 'UTF-8')));
+		// Subtitle (optional)
+		if ($localizedSubtitle) {
+			$titleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Subtitle', htmlspecialchars(PKPString::html2text($localizedSubtitle), ENT_COMPAT, 'UTF-8')));
+		}
 		return $titleNode;
 	}
 

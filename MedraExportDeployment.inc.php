@@ -22,12 +22,13 @@ define('MEDRA_XMLNS' , 'http://www.editeur.org/onix/DOIMetadata/2.0');
 define('MEDRA_XMLNS_XSI' , 'http://www.w3.org/2001/XMLSchema-instance');
 define('MEDRA_XSI_SCHEMAVERSION' , '2.0');
 define('MEDRA_XSI_SCHEMALOCATION' , 'http://www.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd');
+define('MEDRA_XSI_SCHEMALOCATION_DEV' , 'http://www-medra-dev.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd');
 
 class MedraExportDeployment {
 	/** @var Context The current import/export context */
 	var $_context;
 
-	/** @var Plugin The current import/export plugin */
+	/** @var MedraExportPlugin The current import/export plugin */
 	var $_plugin;
 
 	/**
@@ -80,7 +81,7 @@ class MedraExportDeployment {
 	 * @return string
 	 */
 	function getXmlSchemaLocation() {
-		return MEDRA_XSI_SCHEMALOCATION;
+		return $this->_plugin->isTestMode($this->_context) ? MEDRA_XSI_SCHEMALOCATION_DEV : MEDRA_XSI_SCHEMALOCATION;
 	}
 
 	/**
