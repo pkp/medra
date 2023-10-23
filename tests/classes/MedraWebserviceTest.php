@@ -14,8 +14,9 @@
  * @brief Test class for MedraWebservice.
  */
 
-import('lib.pkp.tests.PKPTestCase');
-import('plugins.importexport.medra.classes.MedraWebservice');
+use PKP\tests\PKPTestCase;
+use APP\plugins\generic\medra\classes\MedraWebservice;
+use PKP\config\Config;
 
 class MedraWebserviceTest extends PKPTestCase {
 	private $ws;
@@ -30,7 +31,7 @@ class MedraWebserviceTest extends PKPTestCase {
 			);
 		}
 
-		$this->ws = new MedraWebservice(MEDRA_WS_ENDPOINT_DEV, 'TEST_OJS', $medraPassword);
+		$this->ws = new MedraWebservice(MedraWebservice::MEDRA_WS_ENDPOINT_DEV, 'TEST_OJS', $medraPassword);
 		parent::setUp();
 	}
 
@@ -77,7 +78,7 @@ class MedraWebserviceTest extends PKPTestCase {
 	 * @return string
 	 */
 	private function getTestData() {
-		$sampleFile = './plugins/importexport/medra/tests/functional/serial-issue-as-work.xml';
+		$sampleFile = './plugins/generic/medra/tests/functional/serial-issue-as-work.xml';
 		return file_get_contents($sampleFile);
 	}
 }

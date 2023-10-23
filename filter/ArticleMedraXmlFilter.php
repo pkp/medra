@@ -1,53 +1,64 @@
 <?php
 
 /**
- * @file plugins/importexport/medra/filter/ArticleMedraXmlFilter.inc.php
+ * @file plugins/generic/medra/filter/ArticleMedraXmlFilter.php
  *
  * Copyright (c) 2014-2023 Simon Fraser University
  * Copyright (c) 2000-2023 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ArticleMedraXmlFilter
- * @ingroup plugins_importexport_medra
  *
  * @brief Class that converts an Article as work to a O4DOI XML document.
  */
 
-import('plugins.importexport.medra.filter.O4DOIXmlFilter');
+namespace APP\plugins\generic\medra\filter;
+
+use APP\author\Author;
+use APP\core\Application;
+use APP\core\Services;
+use APP\facades\Repo;
+use APP\issue\Issue;
+use APP\plugins\DOIPubIdExportPlugin;
+use APP\plugins\generic\medra\filter\O4DOIXmlFilter;
+use APP\submission\Submission;
+use DOMDocument;
+use DOMElement;
+use PKP\context\Context;
+use PKP\core\PKPString;
+use PKP\db\DAORegistry;
+use PKP\galley\Galley;
+use PKP\i18n\LocaleConversion;
+use PKP\submission\GenreDAO;
 
 
-class ArticleMedraXmlFilter extends O4DOIXmlFilter {
+class ArticleMedraXmlFilter extends O4DOIXmlFilter
+{
+
 	/**
 	 * Constructor
-	 * @param $filterGroup FilterGroup
+	 * @param \PKP\filter\FilterGroup $filterGroup
 	 */
-	function __construct($filterGroup) {
-		$this->setDisplayName('mEDRA XML article export');
+	function __construct($filterGroup)
+	{
 		parent::__construct($filterGroup);
+		$this->setDisplayName('mEDRA XML article export');
 	}
 
 	/**
 	 * @copydoc O4DOIXmlFilter::isWork()
 	 */
-	function isWork($context, $plugin) {
+	function isWork(Context $context, DOIPubIdExportPlugin $plugin): bool
+	{
 		return true;
 	}
 
 	/**
 	 *  @copydoc O4DOIXmlFilter::getRootNodeName
 	 */
-	function getRootNodeName() {
+	function getRootNodeName(): string
+	{
 		return 'ONIXDOISerialArticleWorkRegistrationMessage';
-	}
-
-	//
-	// Implement template methods from PersistableFilter
-	//
-	/**
-	 * @copydoc PersistableFilter::getClassName()
-	 */
-	function getClassName() {
-		return 'plugins.importexport.medra.filter.ArticleMedraXmlFilter';
 	}
 
 	//
@@ -55,16 +66,15 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 	//
 	/**
 	 * @see Filter::process()
-	 * @param $pubObjects array Array of Submissions or ArticleGalleys
+	 * @param Submission|Galley[] $pubObjects
 	 * @return DOMDocument
 	 */
-	function &process(&$pubObjects) {
+	function &process(&$pubObjects)
+	{
 		// Create the XML document
 		$doc = new DOMDocument('1.0', 'utf-8');
 		$doc->preserveWhiteSpace = false;
 		$doc->formatOutput = true;
-		$deployment = $this->getDeployment();
-		$context = $deployment->getContext();
 
 		// Create the root node
 		$rootNode = $this->createRootNode($doc, $this->getRootNodeName());
@@ -83,62 +93,68 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 
 	/**
 	 * Create and return the article (as work or as manifestation) node.
-	 * @param $doc DOMDocument
-	 * @param $pubObject Submission|ArticleGalley
-	 * @return DOMElement
 	 */
-	function createArticleNode($doc, $pubObject) {
+	function createArticleNode(DOMDocument $doc, Submission|Galley $pubObject): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$cache = $deployment->getCache();
 		$plugin = $deployment->getPlugin();
 		$request = Application::get()->getRequest();
-		$router = $request->getRouter();
-
-		assert ((is_a($pubObject, 'Submission') && $this->isWork($context, $plugin)) ||
-				(is_a($pubObject, 'ArticleGalley') && !$this->isWork($context, $plugin)));
 
 		if (is_a($pubObject, 'Submission')) {
 			$galley = null;
+			/** @var Submission $article */
 			$article = $pubObject;
+			$doi = $article->getCurrentPublication()->getDoi();
+			$registeredDoi = $article->getCurrentPublication()->getData('medra::registeredDoi');
 			if (!$cache->isCached('articles', $article->getId())) {
 				$cache->add($article, null);
 			}
 			$articleNodeName = 'DOISerialArticleWork';
 			$workOrProduct = 'Work';
-			$epubFormat = O4DOI_EPUB_FORMAT_HTML;
+			$epubFormat = self::O4DOI_EPUB_FORMAT_HTML;
 		} else {
+			/** @var Galley $galley */
 			$galley = $pubObject;
-			$publication = Services::get('publication')->get($galley->getData('publicationId'));
+			$doi = $pubObject->getDoi();
+			$registeredDoi = $pubObject->getData('medra::registeredDoi');
+			$publication = Repo::publication()->get($galley->getData('publicationId'));
 			if ($cache->isCached('articles', $publication->getData('submissionId'))) {
+				/** @var Submission $article */
 				$article = $cache->get('articles', $publication->getData('submissionId'));
 			} else {
-				$article = Services::get('submission')->get($publication->getData('submissionId'));
-				if ($article && $article->getData('status') === STATUS_PUBLISHED) $cache->add($article, null);
+				$article = Repo::submission()->get($publication->getData('submissionId'));
+				if ($article && $article->getData('status') === Submission::STATUS_PUBLISHED) $cache->add($article, null);
 			}
 			$articleNodeName = 'DOISerialArticleVersion';
 			$workOrProduct = 'Product';
 			$epubFormat = null;
-			if ($galley->isPdfGalley()) {
-				$epubFormat = O4DOI_EPUB_FORMAT_PDF;
-			} else if ($galley->getRemoteURL() || $galley->getFileType() == 'text/html') {
-				$epubFormat = O4DOI_EPUB_FORMAT_HTML;
+			$submissionFileId = $galley->getData('submissionFileId');
+            if ($submissionFileId && $submissionFile = Repo::submissionFile()->get($submissionFileId)) {
+                if ($submissionFile->getData('mimetype') == 'application/pdf') {
+					$epubFormat = self::O4DOI_EPUB_FORMAT_PDF;
+				} else if ($submissionFile->getData('mimetype') == 'text/html') {
+					$epubFormat = self::O4DOI_EPUB_FORMAT_HTML;
+				}
+			} else if ($galley->getData('urlRemote')) {
+				$epubFormat = self::O4DOI_EPUB_FORMAT_HTML;
 			}
 		}
 
 		$articleNode = $doc->createElementNS($deployment->getNamespace(), $articleNodeName);
 		// Notification type (mandatory)
-		$doi = $pubObject->getStoredPubId('doi');
-		$registeredDoi = $pubObject->getData('medra::registeredDoi');
 		assert(empty($registeredDoi) || $registeredDoi == $doi);
-		$notificationType = (empty($registeredDoi) ? O4DOI_NOTIFICATION_TYPE_NEW : O4DOI_NOTIFICATION_TYPE_UPDATE);
+		$notificationType = (empty($registeredDoi) ? self::O4DOI_NOTIFICATION_TYPE_NEW : self::O4DOI_NOTIFICATION_TYPE_UPDATE);
 		$articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'NotificationType', $notificationType));
 		// DOI (mandatory)
 		$articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOI', htmlspecialchars($doi, ENT_COMPAT, 'UTF-8')));
 		// DOI URL (mandatory)
 		$urlPath = $article->getBestId();
 		if ($galley) $urlPath = [$article->getBestId(), $galley->getBestGalleyId()];
-		$url = $router->url($request, $context->getPath(), 'article', 'view', $urlPath, null, null, true);
+		$dispatcher = $this->_getDispatcher($request);
+        $url = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'view', $urlPath, null, null, true);
 		if ($plugin->isTestMode($context)) {
 			// Change server domain for testing.
 			$url = PKPString::regexp_replace('#://[^\s]+/index.php#', '://example.com/index.php', $url);
@@ -152,23 +168,22 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$submissionGalleys = $pdfGalleys = $remoteGalleys = [];
 		// preferred PDF full-text for the as-crawled URL
 		$pdfGalleyInArticleLocale = null;
-		$genreDao = DAORegistry::getDAO('GenreDAO'); /* @var $genreDao GenreDAO */
+		$genreDao = DAORegistry::getDAO('GenreDAO'); /** @var GenreDAO $genreDao */
 		foreach ($galleysForCollection as $galleyForCollection) {
-			if (!$galleyForCollection->getRemoteURL()) {
-				$galleyForCollectionFile = $galleyForCollection->getFile();
-				if ($galleyForCollectionFile) {
-					$genre = $genreDao->getById($galleyForCollectionFile->getGenreId());
-					if (!$genre->getSupplementary()) {
-						$submissionGalleys[] = $galleyForCollection;
-						if ($galleyForCollection->isPdfGalley()) {
-							$pdfGalleys[] = $galleyForCollection;
-							if (!$pdfGalleyInArticleLocale && $galleyForCollection->getLocale() == $article->getCurrentPublication()->getData('locale')) {
-								$pdfGalleyInArticleLocale = $galleyForCollection;
-							}
+			/** @var Galley $galleyForCollection */
+			$submissionFileId = $galleyForCollection->getData('submissionFileId');
+            if ($submissionFileId && $galleyForCollectionFile = Repo::submissionFile()->get($submissionFileId)) {
+				$genre = $genreDao->getById($galleyForCollectionFile->getData('genreId'));
+				if (!$genre->getSupplementary()) {
+					$submissionGalleys[] = $galleyForCollection;
+					if ($galleyForCollectionFile->getData('mimetype') == 'application/pdf') {
+						$pdfGalleys[] = $galleyForCollection;
+						if (!$pdfGalleyInArticleLocale && $galleyForCollection->getLocale() == $article->getCurrentPublication()->getData('locale')) {
+							$pdfGalleyInArticleLocale = $galleyForCollection;
 						}
 					}
 				}
-			} else {
+			} else if ($galley->getData('urlRemote')) {
 				$remoteGalleys[] = $galleyForCollection;
 			}
 		}
@@ -201,7 +216,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		// WorkIdentifier - proprietary ID
 		$pubObjectProprietaryId = $context->getId() . '-' . $article->getCurrentPublication()->getData('issueId') . '-' . $article->getId();
 		if ($galley) $pubObjectProprietaryId .= '-g' . $galley->getId();
-		$articleNode->appendChild($this->createIdentifierNode($doc, $workOrProduct, O4DOI_ID_TYPE_PROPRIETARY, $pubObjectProprietaryId));
+		$articleNode->appendChild($this->createIdentifierNode($doc, $workOrProduct, self::O4DOI_ID_TYPE_PROPRIETARY, $pubObjectProprietaryId));
 		// Issue/journal locale precedence.
 		$journalLocalePrecedence = $this->getObjectLocalePrecedence($context, null, null);
 		// Serial Publication (mandatory)
@@ -209,10 +224,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		// Journal Issue (mandatory)
 		$issueId = $article->getCurrentPublication()->getData('issueId');
 		if ($cache->isCached('issues', $issueId)) {
+			/** @var Issue $issue */
 			$issue = $cache->get('issues', $issueId);
 		} else {
-			$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-			$issue = $issueDao->getById($issueId, $context->getId());
+			$issue = Repo::issue()->get($issueId, $context->getId());
 			if ($issue) $cache->add($issue, null);
 		}
 		$articleNode->appendChild($this->createJournalIssueNode($doc, $issue, $journalLocalePrecedence));
@@ -226,14 +241,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 
 	/**
 	 * Create a content item node.
-	 * @param $doc DOMDocument
-	 * @param $issue Issue
-	 * @param $article Submission
-	 * @param $galley ArticleGalley
-	 * @param $objectLocalePrecedence array
-	 * @return DOMElement
 	 */
-	function createContentItemNode($doc, $issue, $article, $galley, $objectLocalePrecedence) {
+	function createContentItemNode(DOMDocument $doc, Issue $issue, Submission $article, ?Galley $galley, array $objectLocalePrecedence): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$plugin = $deployment->getPlugin();
@@ -260,12 +271,12 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			$contentItemNode->appendChild($textItemNode);
 		}
 		// Extent (for article-as-manifestation only)
-		if ($galley && !$galley->getRemoteURL()) {
-			$galleyFile = $galley->getFile();
-			if ($galleyFile) {
+		if ($galley && !$galley->getData('urlRemote')) {
+			$submissionFileId = $galley->getData('submissionFileId');
+            if ($submissionFileId && $galleyFile = Repo::submissionFile()->get($submissionFileId)) {
 				$path = $galleyFile->getData('path');
-				$fileSize = Services::get('file')->fs->getSize($path);
-				$contentItemNode->appendChild($this->createExtentNode($doc, $fileSize));
+				$size = Services::get('file')->fs->fileSize($path);
+				$contentItemNode->appendChild($this->createExtentNode($doc, $size));
 			}
 		}
 		// Article Title (mandatory)
@@ -273,7 +284,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		assert(!empty($titles));
 		foreach ($titles as $locale => $title) {
 			$localizedSubtitle = $article->getCurrentPublication()->getData('subtitle', $locale);
-			$contentItemNode->appendChild($this->createTitleNode($doc, $locale, $title, O4DOI_TITLE_TYPE_FULL, $localizedSubtitle));
+			$contentItemNode->appendChild($this->createTitleNode($doc, $locale, $title, self::O4DOI_TITLE_TYPE_FULL, $localizedSubtitle));
 		}
 		// Contributors
 		$authors = $article->getCurrentPublication()->getData('authors');
@@ -281,20 +292,19 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			$contentItemNode->appendChild($this->createContributorNode($doc, $author, $objectLocalePrecedence));
 		}
 		// Language
-		$languageCode = AppLocale::get3LetterIsoFromLocale($objectLocalePrecedence[0]);
+		$languageCode = LocaleConversion::get3LetterIsoFromLocale($objectLocalePrecedence[0]);
 		assert(!empty($languageCode));
 		$languageNode = $doc->createElementNS($deployment->getNamespace(), 'Language');
-		$languageNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'LanguageRole', O4DOI_LANGUAGE_ROLE_LANGUAGE_OF_TEXT));
+		$languageNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'LanguageRole', self::O4DOI_LANGUAGE_ROLE_LANGUAGE_OF_TEXT));
 		$languageNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'LanguageCode', $languageCode));
 		$contentItemNode->appendChild($languageNode);
 		// Article keywords
 		// SubjectClass will be left out here, because we don't know the scheme/classification name
-		$submissionKeywordDao = DAORegistry::getDAO('SubmissionKeywordDAO'); /* @var $submissionKeywordDao SubmissionKeywordDAO */
-		$allKeywords = $submissionKeywordDao->getKeywords($article->getCurrentPublication()->getId(), $context->getSupportedSubmissionLocales());
+		$allKeywords = $article->getCurrentPublication()->getData('keywords');
 		$keywords = $this->getPrimaryTranslation($allKeywords, $objectLocalePrecedence);
 		if (!empty($keywords)) {
 			$keywordsString = implode(';', $keywords);
-			$contentItemNode->appendChild($this->createSubjectNode($doc, O4DOI_SUBJECT_SCHEME_PUBLISHER, $keywordsString));
+			$contentItemNode->appendChild($this->createSubjectNode($doc, self::O4DOI_SUBJECT_SCHEME_PUBLISHER, $keywordsString));
 		}
 		// Object Description 'OtherText'
 		$descriptions = $this->getTranslationsByPrecedence($article->getCurrentPublication()->getData('abstract'), $objectLocalePrecedence);
@@ -309,7 +319,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 
 		// Relations
 		// Issue
-		if ($plugin->getSetting($context->getId(), 'exportIssuesAs') == O4DOI_ISSUE_AS_WORK) {
+		if ($plugin->getSetting($context->getId(), 'exportIssuesAs') == self::O4DOI_ISSUE_AS_WORK) {
 			// related work:
 			// - is part of issue-as-work
 			$issueWorkOrProduct = 'Work';
@@ -319,10 +329,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			$issueWorkOrProduct = 'Product';
 		}
 		$issueProprietaryId = $context->getId() . '-' . $issue->getId();
-		$relatedIssueIds = [O4DOI_ID_TYPE_PROPRIETARY => $issueProprietaryId];
+		$relatedIssueIds = [self::O4DOI_ID_TYPE_PROPRIETARY => $issueProprietaryId];
 		$issueDoi = $issue->getStoredPubId('doi');
-		if (!empty($issueDoi)) $relatedIssueIds[O4DOI_ID_TYPE_DOI] = $issueDoi;
-		$relatedIssueNode = $this->createRelatedNode($doc, $issueWorkOrProduct, O4DOI_RELATION_IS_PART_OF, $relatedIssueIds);
+		if (!empty($issueDoi)) $relatedIssueIds[self::O4DOI_ID_TYPE_DOI] = $issueDoi;
+		$relatedIssueNode = $this->createRelatedNode($doc, $issueWorkOrProduct, self::O4DOI_RELATION_IS_PART_OF, $relatedIssueIds);
 		// Galleys
 		$galleysByArticle = $article->getCurrentPublication()->getData('galleys');
 		if (!$galley) { // if exporting object is an article
@@ -331,10 +341,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			// - is manifested in articles-as-manifestation
 			foreach($galleysByArticle as $relatedGalley) {
 				$galleyProprietaryId = $context->getId() . '-' . $issue->getId() . '-' . $article->getId() . '-g' . $relatedGalley->getId();
-				$relatedGalleyIds = [O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId];
+				$relatedGalleyIds = [self::O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId];
 				$galleyDoi = $relatedGalley->getStoredPubId('doi');
-				if (!empty($galleyDoi)) $relatedGalleyIds[O4DOI_ID_TYPE_DOI] = $galleyDoi;
-				$contentItemNode->appendChild($this->createRelatedNode($doc, 'Product', O4DOI_RELATION_IS_MANIFESTED_IN, $relatedGalleyIds));
+				if (!empty($galleyDoi)) $relatedGalleyIds[self::O4DOI_ID_TYPE_DOI] = $galleyDoi;
+				$contentItemNode->appendChild($this->createRelatedNode($doc, 'Product', self::O4DOI_RELATION_IS_MANIFESTED_IN, $relatedGalleyIds));
 				unset($relatedGalley, $relatedGalleyIds, $galleyProprietaryId, $galleyDoi);
 			}
 		} else {
@@ -344,10 +354,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			// related work:
 			// - is a manifestation of article-as-work
 			$articleProprietaryId = $context->getId() . '-' . $article->getCurrentPublication()->getData('issueId') . '-' . $article->getId();
-			$relatedArticleIds = [O4DOI_ID_TYPE_PROPRIETARY => $articleProprietaryId];
-			$doi = $article->getCurrentPublication()->getStoredPubId('doi');
-			if (!empty($doi)) $relatedArticleIds[O4DOI_ID_TYPE_DOI] = $doi;
-			$contentItemNode->appendChild($this->createRelatedNode($doc, 'Work', O4DOI_RELATION_IS_A_MANIFESTATION_OF, $relatedArticleIds));
+			$relatedArticleIds = [self::O4DOI_ID_TYPE_PROPRIETARY => $articleProprietaryId];
+			$doi = $article->getCurrentPublication()->getDoi();
+			if (!empty($doi)) $relatedArticleIds[self::O4DOI_ID_TYPE_DOI] = $doi;
+			$contentItemNode->appendChild($this->createRelatedNode($doc, 'Work', self::O4DOI_RELATION_IS_A_MANIFESTATION_OF, $relatedArticleIds));
 			unset($relatedArticleIds);
 
 			// Include issue-as-manifestation after article-as-work.
@@ -356,16 +366,16 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			// related products:
 			foreach($galleysByArticle as $relatedGalley) {
 				$galleyProprietaryId = $context->getId() . '-' . $issue->getId() . '-' . $article->getId() . '-g' . $relatedGalley->getId();
-				$relatedGalleyIds = [O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId];
-				$galleyDoi = $relatedGalley->getStoredPubId('doi');
-				if (!empty($galleyDoi)) $relatedGalleyIds[O4DOI_ID_TYPE_DOI] = $galleyDoi;
+				$relatedGalleyIds = [self::O4DOI_ID_TYPE_PROPRIETARY => $galleyProprietaryId];
+				$galleyDoi = $relatedGalley->getDoi();
+				if (!empty($galleyDoi)) $relatedGalleyIds[self::O4DOI_ID_TYPE_DOI] = $galleyDoi;
 
 				// - is a different form of all other articles-as-manifestation
 				//   with the same article id and language but different form
 				if ($galley->getLocale() == $relatedGalley->getLocale() &&
 						$galley->getLabel() != $relatedGalley->getLabel()) {
 
-							$contentItemNode->appendChild($this->createRelatedNode($doc, 'Product', O4DOI_RELATION_IS_A_DIFFERENT_FORM_OF, $relatedGalleyIds));
+							$contentItemNode->appendChild($this->createRelatedNode($doc, 'Product', self::O4DOI_RELATION_IS_A_DIFFERENT_FORM_OF, $relatedGalleyIds));
 				}
 
 				// - is a different language version of all other articles-as-manifestation
@@ -373,14 +383,14 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 				if ($galley->getLabel() == $relatedGalley->getLabel() &&
 						$galley->getLocale() != $relatedGalley->getLocale()) {
 
-							$contentItemNode->appendChild($this->createRelatedNode($doc, 'Product', O4DOI_RELATION_IS_A_LANGUAGE_VERSION_OF, $relatedGalleyIds));
+							$contentItemNode->appendChild($this->createRelatedNode($doc, 'Product', self::O4DOI_RELATION_IS_A_LANGUAGE_VERSION_OF, $relatedGalleyIds));
 				}
 				unset($relatedGalley, $relatedGalleyIds, $galleyProprietaryId, $galleyDoi);
 			}
 
 		}
 		// Add citation list (unstructured)
-		$citationDao = DAORegistry::getDAO('CitationDAO'); /* @var $citationDao CitationDAO */
+		$citationDao = DAORegistry::getDAO('CitationDAO'); /** @var CitationDAO $citationDao */
 		$parsedCitations = $citationDao->getByPublicationId($article->getCurrentPublication()->getId())->toArray();
 		if(!empty($parsedCitations)){
 			$this->appendCitationListNodes($doc, $contentItemNode, $article, $parsedCitations);
@@ -391,12 +401,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 
 	/**
 	 * Create a contributor node.
-	 * @param $doc DOMDocument
-	 * @param $author Author
-	 * @param $objectLocalePrecedence array
-	 * @return DOMElement
 	 */
-	function createContributorNode($doc, $author, $objectLocalePrecedence) {
+	function createContributorNode(DOMDocument $doc, Author $author, array $objectLocalePrecedence): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$contributorNode = $doc->createElementNS($deployment->getNamespace(), 'Contributor');
 		// Sequence number
@@ -404,27 +412,27 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$seq++; // Sequences must begin with 1, so bump our internal sequence by 1.
 		$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SequenceNumber', $seq));
 		// Contributor role (mandatory)
-		$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ContributorRole', O4DOI_CONTRIBUTOR_ROLE_ACTUAL_AUTHOR));
+		$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ContributorRole', self::O4DOI_CONTRIBUTOR_ROLE_ACTUAL_AUTHOR));
 		// Contributor ORCID
 		if (!empty($author->getOrcid())) {
-			$contributorNode->appendChild($this->createNameIdentifierNode($doc, O4DOI_NAME_IDENTIFIER_TYPE_ORCID, $author->getOrcid()));
+			$contributorNode->appendChild($this->createNameIdentifierNode($doc, self::O4DOI_NAME_IDENTIFIER_TYPE_ORCID, $author->getOrcid()));
 		}
 		// Person name (mandatory)
-		$personName = $author->getFullName(false);
+		$personName = $author->getFullName(false, false, $objectLocalePrecedence[0]);
 		assert(!empty($personName));
 		$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'PersonName', htmlspecialchars($personName, ENT_COMPAT, 'UTF-8')));
 		// Inverted person name
-		$invertedPersonName = $author->getFullName(false, true);
+		$invertedPersonName = $author->getFullName(false, true, $objectLocalePrecedence[0]);
 		assert(!empty($invertedPersonName));
 		$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'PersonNameInverted', htmlspecialchars($invertedPersonName, ENT_COMPAT, 'UTF-8')));
 		// Names before key
 		$locale = $author->getSubmissionLocale();
-		$nameBeforeKey = $author->getLocalizedData(IDENTITY_SETTING_GIVENNAME, $locale);
+		$nameBeforeKey = $author->getLocalizedData(Author::IDENTITY_SETTING_GIVENNAME, $locale);
 		assert(!empty($nameBeforeKey));
 		$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'NamesBeforeKey', htmlspecialchars($nameBeforeKey, ENT_COMPAT, 'UTF-8')));
 		// Key names
-		if ($author->getLocalizedFamilyName() != '') {
-			$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($author->getLocalizedFamilyName(), ENT_COMPAT, 'UTF-8')));
+		if ($familyName = $author->getLocalizedData(Author::IDENTITY_SETTING_FAMILYNAME, $locale) != '') {
+			$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($familyName, ENT_COMPAT, 'UTF-8')));
 		} else {
 			$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($personName, ENT_COMPAT, 'UTF-8')));
 		}
@@ -445,13 +453,11 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 
 	/**
 	 * Create a subject node.
-	 * @param $doc DOMDocument
-	 * @param $subjectSchemeId string One of the O4DOI_SUBJECT_SCHEME_* constants.
-	 * @param $subjectHeadingOrCode string The subject.
-	 * @param $subjectSchemeName string|null A subject scheme name.
-	 * @return DOMElement
+	 * @param string $subjectSchemeId O4DOI_SUBJECT_SCHEME_*
 	 */
-	function createSubjectNode($doc, $subjectSchemeId, $subjectHeadingOrCode, $subjectSchemeName = null) {
+	function createSubjectNode(DOMDocument $doc, string $subjectSchemeId, string $subjectHeadingOrCode, string $subjectSchemeName = null): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$subjectNode = $doc->createElementNS($deployment->getNamespace(), 'Subject');
 		// Subject Scheme Identifier
@@ -470,12 +476,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 
 	/**
 	 * Append the collection node 'Collection property="crawler-based"' to the Article data node.
-	 * @param $doc DOMDocument
-	 * @param $articleNode DOMElement
-	 * @param $article Article
-	 * @param $galleys array of galleys
 	 */
-	function appendAsCrawledCollectionNodes($doc, $articleNode, $article, $galleys) {
+	function appendAsCrawledCollectionNodes(DOMDocument $doc, DOMElement $articleNode, Submission $article, array $galleys): void
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$request = Application::get()->getRequest();
@@ -484,7 +488,9 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$crawlerBasedCollectionNode->setAttribute('property', 'crawler-based');
 		foreach ($galleys as $crawledGalley) {
 			$urlPath = [$article->getBestArticleId(), $crawledGalley->getBestGalleyId()];
-			$resourceURL = $request->url($context->getPath(), 'article', 'download', $urlPath, null, null, true);
+			$dispatcher = $this->_getDispatcher($request);
+			$resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true);
+			//$resourceURL = $request->url($context->getPath(), 'article', 'download', $urlPath, null, null, true);
 			$iParadigmsItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
 			$iParadigmsItemNode->setAttribute('crawler', 'iParadigms');
 			$iParadigmsItemNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL)));
@@ -495,12 +501,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 
 	/**
 	 * Append the collection node 'Collection property="text-mining"' to the Article data node.
-	 * @param $doc DOMDocument
-	 * @param $articleNode DOMElement
-	 * @param $article Article
-	 * @param $galleys array of galleys
 	 */
-	function appendTextMiningCollectionNodes($doc, $articleNode, $article, $galleys) {
+	function appendTextMiningCollectionNodes(DOMDocument $doc, DOMElement $articleNode, Submission $article, array $galleys): void
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$request = Application::get()->getRequest();
@@ -509,7 +513,9 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$textMiningCollectionNode->setAttribute('property', 'text-mining');
 		foreach ($galleys as $galley) {
 			$urlPath = [$article->getBestArticleId(), $galley->getBestGalleyId()];
-			$resourceURL = $request->url($context->getPath(), 'article', 'download', $urlPath, null, null, true);
+			$dispatcher = $this->_getDispatcher($request);
+			$resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true);
+			//$resourceURL = $request->url($context->getPath(), 'article', 'download', $urlPath, null, null, true);
 			$textMiningItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
 			$resourceNode = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL));
 			if (!$galley->getRemoteURL()) $resourceNode->setAttribute('mime_type', $galley->getFileType());
@@ -521,12 +527,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 
 	/**
 	 * Append the CitationList node with unstructured citations to the ContentItem data node.
-	 * @param $doc DOMDocument
-	 * @param $contentItemNode DOMElement
-	 * @param $article Article
-	 * @param $parsedCitations array of Citations
 	 */
-	function appendCitationListNodes($doc, $contentItemNode, $article, $parsedCitations) {
+	function appendCitationListNodes(DOMDocument $doc, DOMElement $contentItemNode, Submission $article, array $parsedCitations): void
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$medraCitationNamespace = 'http://www.medra.org/DOIMetadata/2.0/Citations';
 		$citationListNode = $doc->createElementNS($deployment->getNamespace(), 'cl:CitationList');
@@ -541,7 +545,4 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		}
 		$contentItemNode->appendChild($citationListNode);
 	}
-
 }
-
-

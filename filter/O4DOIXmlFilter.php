@@ -1,125 +1,139 @@
 <?php
 
 /**
- * @file plugins/importexport/medra/filter/O4DOIXmlFilter.inc.php
+ * @file plugins/generic/medra/filter/O4DOIXmlFilter.php
  *
  * Copyright (c) 2014-2023 Simon Fraser University
  * Copyright (c) 2000-2023 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class O4DOIXmlFilter
- * @ingroup plugins_importexport_medra
  *
  * @brief Basis class for converting objects (issues, articles, galleys) to a O4DOI XML document.
  */
 
-// Notification types
-define('O4DOI_NOTIFICATION_TYPE_NEW', '06');
-define('O4DOI_NOTIFICATION_TYPE_UPDATE', '07');
+namespace APP\plugins\generic\medra\filter;
 
-// ID types
-define('O4DOI_ID_TYPE_PROPRIETARY', '01');
-define('O4DOI_ID_TYPE_DOI', '06');
-define('O4DOI_ID_TYPE_ISSN', '07');
-
-// Text formats
-define('O4DOI_TEXTFORMAT_ASCII', '00');
-
-// Title types
-define('O4DOI_TITLE_TYPE_FULL', '01');
-define('O4DOI_TITLE_TYPE_ISSUE', '07');
-
-// Name identifier types
-define('O4DOI_NAME_IDENTIFIER_TYPE_PROPRIETARY', '01');
-define('O4DOI_NAME_IDENTIFIER_TYPE_ISNI', '16');
-define('O4DOI_NAME_IDENTIFIER_TYPE_ORCID', '21');
-
-// Publishing roles
-define('O4DOI_PUBLISHING_ROLE_PUBLISHER', '01');
-
-// Product forms
-define('O4DOI_PRODUCT_FORM_PRINT', 'JB');
-define('O4DOI_PRODUCT_FORM_ELECTRONIC', 'JD');
-
-// ePublication formats
-// S. ONIX List 11 (https://onix-codelists.io/codelist/11)
-// We will consider only HTML and PDF
-define('O4DOI_EPUB_FORMAT_HTML', '01');
-define('O4DOI_EPUB_FORMAT_PDF', '02');
-
-// Date formats
-define('O4DOI_DATE_FORMAT_YYYY', '05');
-
-// Extent types
-define('O4DOI_EXTENT_TYPE_FILESIZE', '22');
-
-// Extent units
-define('O4DOI_EXTENT_UNIT_BYTES', '17');
-
-// Contributor roles
-define('O4DOI_CONTRIBUTOR_ROLE_ACTUAL_AUTHOR', 'A01');
-
-// Language roles
-define('O4DOI_LANGUAGE_ROLE_LANGUAGE_OF_TEXT', '01');
-
-// Subject schemes
-define('O4DOI_SUBJECT_SCHEME_PUBLISHER', '23');
-define('O4DOI_SUBJECT_SCHEME_PROPRIETARY', '24');
-
-// Text type codes
-define('O4DOI_TEXT_TYPE_MAIN_DESCRIPTION', '01');
-
-// Relation codes
-define('O4DOI_RELATION_INCLUDES', '80');
-define('O4DOI_RELATION_IS_PART_OF', '81');
-define('O4DOI_RELATION_IS_A_NEW_VERSION_OF', '82');
-define('O4DOI_RELATION_HAS_A_NEW_VERSION', '83');
-define('O4DOI_RELATION_IS_A_DIFFERENT_FORM_OF', '84');
-define('O4DOI_RELATION_IS_A_LANGUAGE_VERSION_OF', '85');
-define('O4DOI_RELATION_IS_MANIFESTED_IN', '89');
-define('O4DOI_RELATION_IS_A_MANIFESTATION_OF', '90');
+use APP\core\Application;
+use APP\issue\Issue;
+use APP\plugins\DOIPubIdExportPlugin;
+use APP\submission\Submission;
+use PKP\context\Context;
+use DOMDocument;
+use DOMElement;
+use PKP\core\PKPString;
+use PKP\facades\Locale;
+use PKP\galley\Galley;
+use PKP\i18n\LocaleConversion;
+use PKP\plugins\importexport\native\filter\NativeExportFilter;
 
 
-import('lib.pkp.plugins.importexport.native.filter.NativeExportFilter');
+abstract class O4DOIXmlFilter extends NativeExportFilter
+{
+	// Work or manifestation
+    public const O4DOI_ISSUE_AS_WORK = 0x01;
+	public const O4DOI_ISSUE_AS_MANIFESTATION = 0x02;
+	public const O4DOI_ARTICLE_AS_WORK = 0x03;
+	public const O4DOI_ARTICLE_AS_MANIFESTATION = 0x04;
+
+	// Notification types
+	public const O4DOI_NOTIFICATION_TYPE_NEW = '06';
+	public const O4DOI_NOTIFICATION_TYPE_UPDATE = '07';
+
+	// ID types
+	public const O4DOI_ID_TYPE_PROPRIETARY = '01';
+	public const O4DOI_ID_TYPE_DOI = '06';
+	public const O4DOI_ID_TYPE_ISSN = '07';
+
+	// Text formats
+	public const O4DOI_TEXTFORMAT_ASCII = '00';
+
+	// Title types
+	public const O4DOI_TITLE_TYPE_FULL = '01';
+	public const O4DOI_TITLE_TYPE_ISSUE = '07';
+
+	// Name identifier types
+	public const O4DOI_NAME_IDENTIFIER_TYPE_PROPRIETARY = '01';
+	public const O4DOI_NAME_IDENTIFIER_TYPE_ISNI = '16';
+	public const O4DOI_NAME_IDENTIFIER_TYPE_ORCID = '21';
+
+	// Publishing roles
+	public const O4DOI_PUBLISHING_ROLE_PUBLISHER = '01';
+
+	// Product forms
+	public const O4DOI_PRODUCT_FORM_PRINT = 'JB';
+	public const O4DOI_PRODUCT_FORM_ELECTRONIC = 'JD';
+
+	// ePublication formats
+	// S. ONIX List 11 (https://onix-codelists.io/codelist/11)
+	// We will consider only HTML and PDF
+	public const O4DOI_EPUB_FORMAT_HTML = '01';
+	public const O4DOI_EPUB_FORMAT_PDF = '02';
+
+	// Date formats
+	public const O4DOI_DATE_FORMAT_YYYY = '05';
+
+	// Extent types
+	public const O4DOI_EXTENT_TYPE_FILESIZE = '22';
+
+	// Extent units
+	public const O4DOI_EXTENT_UNIT_BYTES = '17';
+
+	// Contributor roles
+	public const O4DOI_CONTRIBUTOR_ROLE_ACTUAL_AUTHOR = 'A01';
+
+	// Language roles
+	public const O4DOI_LANGUAGE_ROLE_LANGUAGE_OF_TEXT = '01';
+
+	// Subject schemes
+	public const O4DOI_SUBJECT_SCHEME_PUBLISHER = '23';
+	public const O4DOI_SUBJECT_SCHEME_PROPRIETARY = '24';
+
+	// Text type codes
+	public const O4DOI_TEXT_TYPE_MAIN_DESCRIPTION = '01';
+
+	// Relation codes
+	public const O4DOI_RELATION_INCLUDES = '80';
+	public const O4DOI_RELATION_IS_PART_OF = '81';
+	public const O4DOI_RELATION_IS_A_NEW_VERSION_OF = '82';
+	public const O4DOI_RELATION_HAS_A_NEW_VERSION = '83';
+	public const O4DOI_RELATION_IS_A_DIFFERENT_FORM_OF = '84';
+	public const O4DOI_RELATION_IS_A_LANGUAGE_VERSION_OF = '85';
+	public const O4DOI_RELATION_IS_MANIFESTED_IN = '89';
+	public const O4DOI_RELATION_IS_A_MANIFESTATION_OF = '90';
 
 
-class O4DOIXmlFilter extends NativeExportFilter {
 	/**
 	 * Constructor
-	 * @param $filterGroup FilterGroup
+	 * @param \PKP\filter\FilterGroup $filterGroup
 	 */
-	function __construct($filterGroup) {
+	function __construct($filterGroup)
+	{
 		parent::__construct($filterGroup);
 	}
 
 	/**
 	 * Get whether the object exported is considered as work
-	 * @param $context Context
-	 * @param $plugin DOIPubIdExportPlugin
-	 * @return boolean
 	 */
-	function isWork($context, $plugin) {
+	function isWork(Context $context, DOIPubIdExportPlugin $plugin): bool
+	{
 		return true;
 	}
 
 	/**
 	 * Get root node name
-	 * @return string
 	 */
-	function getRootNodeName() {
-		assert(false);
-	}
+	abstract function getRootNodeName(): string;
 
 	//
 	// Common filter functions
 	//
 	/**
 	 * Create and return the root node.
-	 * @param $doc DOMDocument
-	 * @param $rootNodeName string
-	 * @return DOMElement
 	 */
-	function createRootNode($doc, $rootNodeName) {
+	function createRootNode(DOMDocument $doc, string $rootNodeName): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$rootNode = $doc->createElementNS($deployment->getNamespace(), $rootNodeName);
 		$rootNode->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xsi', $deployment->getXmlSchemaInstance());
@@ -129,10 +143,10 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Create and return the head node.
-	 * @param $doc DOMDocument
-	 * @return DOMElement
 	 */
-	function createHeadNode($doc) {
+	function createHeadNode(DOMDocument $doc): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$plugin = $deployment->getPlugin();
@@ -153,12 +167,11 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Generate O4DOI serial publication node.
-	 * @param $doc DOMDocument
-	 * @param $journalLocalePrecedence array
-	 * @param $epubFormat O4DOI_EPUB_FORMAT_*
-	 * @return DOMElement
+	 * @param string $epubFormat O4DOI_EPUB_FORMAT_*
 	 */
-	function createSerialPublicationNode($doc, $journalLocalePrecedence, $epubFormat = null) {
+	function createSerialPublicationNode(DOMDocument $doc, array $journalLocalePrecedence, string $epubFormat = null): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$plugin = $deployment->getPlugin();
@@ -167,21 +180,20 @@ class O4DOIXmlFilter extends NativeExportFilter {
 		$serialPublicationNode->appendChild($this->createSerialWorkNode($doc, $journalLocalePrecedence));
 		// Electronic Serial Version
 		$onlineIssn = $context->getData('onlineIssn');
-		$serialPublicationNode->appendChild($this->createSerialVersionNode($doc,  $onlineIssn, O4DOI_PRODUCT_FORM_ELECTRONIC, $epubFormat));
+		$serialPublicationNode->appendChild($this->createSerialVersionNode($doc,  $onlineIssn, self::O4DOI_PRODUCT_FORM_ELECTRONIC, $epubFormat));
 		// Print Serial Version
 		if (($printIssn = $context->getData('printIssn')) && $this->isWork($context, $plugin)) {
-			$serialPublicationNode->appendChild($this->createSerialVersionNode($doc,  $printIssn, O4DOI_PRODUCT_FORM_PRINT, null));
+			$serialPublicationNode->appendChild($this->createSerialVersionNode($doc,  $printIssn, self::O4DOI_PRODUCT_FORM_PRINT, null));
 		}
 		return $serialPublicationNode;
 	}
 
 	/**
 	 * Generate O4DOI serial work node.
-	 * @param $doc DOMDocument
-	 * @param $journalLocalePrecedence array
-	 * @return DOMElement
 	 */
-	function createSerialWorkNode($doc, $journalLocalePrecedence) {
+	function createSerialWorkNode(DOMDocument $doc, array $journalLocalePrecedence): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$plugin = $deployment->getPlugin();
@@ -190,7 +202,7 @@ class O4DOIXmlFilter extends NativeExportFilter {
 		$journalTitles = $this->getTranslationsByPrecedence($context->getName(null), $journalLocalePrecedence);
 		assert(!empty($journalTitles));
 		foreach($journalTitles as $locale => $journalTitle) {
-			$serialWorkNode->appendChild($this->createTitleNode($doc, $locale, $journalTitle, O4DOI_TITLE_TYPE_FULL));
+			$serialWorkNode->appendChild($this->createTitleNode($doc, $locale, $journalTitle, self::O4DOI_TITLE_TYPE_FULL));
 		}
 		// Publisher
 		$serialWorkNode->appendChild($this->createPublisherNode($doc, $journalLocalePrecedence));
@@ -201,20 +213,17 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Create a title node.
-	 * @param $doc DOMDocument
-	 * @param $locale string e.g. 'en'
-	 * @param $localizedTitle string
-	 * @param $titleType string One of the O4DOI_TITLE_TYPE_* constants.
-	 * @param $localizedSubtitle string optional
-	 * @return DOMElement
+	 * @param string $titleType O4DOI_TITLE_TYPE_*
 	 */
-	function createTitleNode($doc, $locale, $localizedTitle, $titleType, $localizedSubtitle = null) {
+	function createTitleNode( DOMDocument$doc, string $locale, string $localizedTitle, string $titleType, string $localizedSubtitle = null): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$titleNode = $doc->createElementNS($deployment->getNamespace(), 'Title');
 		// Text format
-		$titleNode->setAttribute('textformat', O4DOI_TEXTFORMAT_ASCII);
+		$titleNode->setAttribute('textformat', self::O4DOI_TEXTFORMAT_ASCII);
 		// Language
-		$language = AppLocale::get3LetterIsoFromLocale($locale);
+		$language = LocaleConversion::get3LetterIsoFromLocale($locale);
 		assert(!empty($language));
 		$titleNode->setAttribute('language', $language);
 		// Title type (mandatory)
@@ -230,12 +239,11 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Create a NameIdentifier node.
-	 * @param $doc DOMDocument
-	 * @param $nameIDType string One of the O4DOI_NAME_IDENTIFIER_TYPE_* constants.
-	 * @param $idValue string
-	 * @return DOMElement
+	 * @param string $nameIDType O4DOI_NAME_IDENTIFIER_TYPE_*
 	 */
-	function createNameIdentifierNode($doc, $nameIDType, $idValue) {
+	function createNameIdentifierNode(DOMDocument $doc, string $nameIDType, string $idValue): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 	    $deployment = $this->getDeployment();
 	    $nameIdentifierNode = $doc->createElementNS($deployment->getNamespace(), 'NameIdentifier');
 	    // NameIDType (mandatory)
@@ -247,16 +255,15 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Create a publisher node.
-	 * @param $doc DOMDocument
-	 * @param $journalLocalePrecedence array
-	 * @return DOMElement
 	 */
-	function createPublisherNode($doc, $journalLocalePrecedence) {
+	function createPublisherNode(DOMDocument $doc, array $journalLocalePrecedence): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$publisherNode = $doc->createElementNS($deployment->getNamespace(), 'Publisher');
 		// Publishing role (mandatory)
-		$publisherNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'PublishingRole', O4DOI_PUBLISHING_ROLE_PUBLISHER));
+		$publisherNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'PublishingRole', self::O4DOI_PUBLISHING_ROLE_PUBLISHER));
 		// Publisher name (mandatory)
 		$publisher = $context->getData('publisherInstitution');
 		if (empty($publisher)) {
@@ -271,27 +278,26 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Create a serial version node.
-	 * @param $doc DOMDocument
-	 * @param $issn string
-	 * @param $productForm One of the O4DOI_PRODUCT_FORM_* constants
-	 * @param $epubFormat O4DOI_EPUB_FORMAT_*
-	 * @return DOMElement
+	 * @param string $productForm O4DOI_PRODUCT_FORM_*
+	 * @param string $epubFormat O4DOI_EPUB_FORMAT_*
 	 */
-	function createSerialVersionNode($doc, $issn, $productForm, $epubFormat = null) {
+	function createSerialVersionNode(DOMDocument $doc, string $issn, string $productForm, string $epubFormat = null): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$serialVersionNode = $doc->createElementNS($deployment->getNamespace(), 'SerialVersion');
 		// Proprietary Journal Identifier
-		if ($productForm == O4DOI_PRODUCT_FORM_ELECTRONIC) {
-			$serialVersionNode->appendChild($this->createIdentifierNode($doc, 'Product', O4DOI_ID_TYPE_PROPRIETARY, $context->getId()));
+		if ($productForm == self::O4DOI_PRODUCT_FORM_ELECTRONIC) {
+			$serialVersionNode->appendChild($this->createIdentifierNode($doc, 'Product', self::O4DOI_ID_TYPE_PROPRIETARY, $context->getId()));
 		}
 		// ISSN
 		if (!empty($issn)) {
-			$serialVersionNode->appendChild($this->createIdentifierNode($doc, 'Product', O4DOI_ID_TYPE_ISSN, $issn));
+			$serialVersionNode->appendChild($this->createIdentifierNode($doc, 'Product', self::O4DOI_ID_TYPE_ISSN, $issn));
 		}
 		// Product Form
 		$serialVersionNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ProductForm', $productForm));
-		if ($productForm == O4DOI_PRODUCT_FORM_ELECTRONIC) {
+		if ($productForm == self::O4DOI_PRODUCT_FORM_ELECTRONIC) {
 			// ePublication Format
 			if ($epubFormat) $serialVersionNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'EpubFormat', $epubFormat));
 			// ePublication Format Description
@@ -302,12 +308,10 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Create the journal issue node.
-	 * @param $doc DOMDocument
-	 * @param $issue Issue
-	 * @param $journalLocalePrecedence array
-	 * @return DOMElement
 	 */
-	function createJournalIssueNode($doc, $issue, $journalLocalePrecedence) {
+	function createJournalIssueNode(DOMDocument $doc, Issue $issue, array $journalLocalePrecedence): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$journalIssueNode = $doc->createElementNS($deployment->getNamespace(), 'JournalIssue');
 		// Volume
@@ -331,7 +335,7 @@ class O4DOIXmlFilter extends NativeExportFilter {
 		$yearlen = strlen($year);
 		if ($issue->getShowYear() && !empty($year) && ($yearlen == 2 || $yearlen == 4)) {
 			$issueDateNode = $doc->createElementNS($deployment->getNamespace(), 'JournalIssueDate');
-			$issueDateNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DateFormat', O4DOI_DATE_FORMAT_YYYY));
+			$issueDateNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DateFormat', self::O4DOI_DATE_FORMAT_YYYY));
 			// Try to extend the year if necessary.
 			if ($yearlen == 2) {
 				// Assume that the issue date will never be
@@ -350,13 +354,11 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Create a related work or product node.
-	 * @param $doc DOMDocument
-	 * @param $workOrProduct string
-	 * @param $relationCode string One of the O4DOI_RELATION_* constants.
-	 * @param $ids array
-	 * @return DOMElement
+	 * @param string $relationCode O4DOI_RELATION_*
 	 */
-	function createRelatedNode($doc, $workOrProduct, $relationCode, $ids) {
+	function createRelatedNode(DOMDocument $doc, string $workOrProduct, string $relationCode, array $ids): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$relatedNode = $doc->createElementNS($deployment->getNamespace(), "Related$workOrProduct");
 		// Relation code (mandatory)
@@ -370,13 +372,12 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Create a work or product id node.
-	 * @param $doc DOMDocument
-	 * @param $workOrProduct string "Work" or "Product"
-	 * @param $idType string One of the O4DOI_ID_TYPE_* constants
-	 * @param $id string The ID.
-	 * @return DOMElement
+	 * @param string $workOrProduct "Work" or "Product"
+	 * @param string $idType O4DOI_ID_TYPE_*
 	 */
-	function createIdentifierNode($doc, $workOrProduct, $idType, $id) {
+	function createIdentifierNode(DOMDocument $doc, string $workOrProduct, string $idType, string $id): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$productIdentifierNode = $doc->createElementNS($deployment->getNamespace(), "${workOrProduct}Identifier");
 		// ID type (mandatory)
@@ -388,51 +389,49 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Create an extent node.
-	 * @param $doc DOMDocument
-	 * @param $fileSize int
-	 * @return DOMElement
 	 */
-	function createExtentNode($doc, $fileSize) {
+	function createExtentNode(DOMDocument $doc, int $fileSize): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$extentNode = $doc->createElementNS($deployment->getNamespace(), 'Extent');
 		// Extent type
-		$extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentType', O4DOI_EXTENT_TYPE_FILESIZE));
+		$extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentType', self::O4DOI_EXTENT_TYPE_FILESIZE));
 		// Extent value
 		$extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentValue',  $fileSize));
 		// Extent unit
-		$extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentUnit',  O4DOI_EXTENT_UNIT_BYTES));
+		$extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentUnit', self::O4DOI_EXTENT_UNIT_BYTES));
 		return $extentNode;
 	 }
 
 	 /**
 	  * Create a description text node.
-	  * @param $doc DOMDocument
-	  * @param $locale string
-	  * @param $description string
-	  * @return DOMElement
 	  */
-	function createOtherTextNode($doc, $locale, $description) {
+	function createOtherTextNode(DOMDocument $doc, string $locale, string $description): DOMElement
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$otherTextNode = $doc->createElementNS($deployment->getNamespace(), 'OtherText');
 		// Text Type
-		$otherTextNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'TextTypeCode', O4DOI_TEXT_TYPE_MAIN_DESCRIPTION));
+		$otherTextNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'TextTypeCode', self::O4DOI_TEXT_TYPE_MAIN_DESCRIPTION));
 		// Text
-		$language = AppLocale::get3LetterIsoFromLocale($locale);
+		$language = LocaleConversion::get3LetterIsoFromLocale($locale);
 		assert(!empty($language));
 		$otherTextNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Text', htmlspecialchars(PKPString::html2text($description), ENT_COMPAT, 'UTF-8')));
-		$node->setAttribute('textformat', O4DOI_TEXTFORMAT_ASCII);
+		$node->setAttribute('textformat', self::O4DOI_TEXTFORMAT_ASCII);
 		$node->setAttribute('language', $language);
 		return $otherTextNode;
 	}
 
-	 //
-	 // Helper functions
-	 //
-	 /**
-	  * Get DOIStructuralType
-	  * @return string
-	  */
-	 function getDOIStructuralType() {
+	//
+	// Helper functions
+	//
+	/**
+	 * Get DOIStructuralType
+	 */
+	function getDOIStructuralType(): string
+	{
+		/** @var PKPNativeImportExportDeployment $deployment */
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$plugin = $deployment->getPlugin();
@@ -441,24 +440,22 @@ class O4DOIXmlFilter extends NativeExportFilter {
 		} else {
 			return 'DigitalFixation';
 		}
-	 }
+	}
 
 	/**
 	 * Identify the locale precedence for this export.
-	 * @param $context Context
-	 * @param $article Submission
-	 * @param $galley ArticleGalley
 	 * @return array A list of valid PKP locales in descending
 	 *  order of priority.
 	 */
-	function getObjectLocalePrecedence($context, $article, $galley) {
+	function getObjectLocalePrecedence(Context $context, ?Submission $article, ?Galley $galley): array
+	{
 		$locales = array();
-		if (is_a($galley, 'ArticleGalley') && AppLocale::isLocaleValid($galley->getLocale())) {
+		if (is_a($galley, 'Galley') && Locale::isLocaleValid($galley->getLocale())) {
 			$locales[] = $galley->getLocale();
 		}
 		if (is_a($article, 'Submission')) {
-			if(AppLocale::isLocaleValid($article->getLocale())) {
-				$locales[] = $article->getLocale();
+			if(Locale::isLocaleValid($article->getData('locale'))) {
+				$locales[] = $article->getData('locale');
 			}
 		}
 
@@ -481,14 +478,15 @@ class O4DOIXmlFilter extends NativeExportFilter {
 	/**
 	 * Identify the primary translation from an array of
 	 * localized data.
-	 * @param $localizedData array An array of localized
+	 * @param array $localizedData An array of localized
 	 *  data (key: locale, value: localized data).
-	 * @param $localePrecedence array An array of locales
+	 * @param array $localePrecedence An array of locales
 	 *  by descending priority.
 	 * @return mixed|null The value of the primary locale
 	 *  or null if no primary translation could be found.
 	 */
-	function getPrimaryTranslation($localizedData, $localePrecedence) {
+	function getPrimaryTranslation(?array $localizedData, array $localePrecedence)
+	{
 		// Check whether we have localized data at all.
 		if (!is_array($localizedData) || empty($localizedData)) return null;
 
@@ -512,13 +510,14 @@ class O4DOIXmlFilter extends NativeExportFilter {
 
 	/**
 	 * Re-order localized data by locale precedence.
-	 * @param $localizedData array An array of localized
+	 * @param array $localizedData An array of localized
 	 *  data (key: locale, value: localized data).
-	 * @param $localePrecedence array An array of locales
+	 * @param array $localePrecedence An array of locales
 	 *  by descending priority.
 	 * @return array Re-ordered localized data.
 	 */
-	function getTranslationsByPrecedence($localizedData, $localePrecedence) {
+	function getTranslationsByPrecedence(?array $localizedData, array $localePrecedence): array
+	{
 		$reorderedLocalizedData = array();
 
 		// Check whether we have localized data at all.
@@ -540,6 +539,16 @@ class O4DOIXmlFilter extends NativeExportFilter {
 		return $reorderedLocalizedData;
 	}
 
+	/**
+     * Helper to ensure dispatcher is available even when called from CLI tools
+     */
+    protected function _getDispatcher(\APP\core\Request $request): \PKP\core\Dispatcher
+    {
+        $dispatcher = $request->getDispatcher();
+        if ($dispatcher === null) {
+            $dispatcher = Application::get()->getDispatcher();
+        }
+
+        return $dispatcher;
+    }
 }
-
-

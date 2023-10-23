@@ -2,7 +2,7 @@
 <!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
 
 <!--
-  * plugins/importexport/medra/version.xml
+  * plugins/generic/medra/version.xml
   *
   * Copyright (c) 2014-2023 Simon Fraser University
   * Copyright (c) 2003-2023 John Willinsky
@@ -12,7 +12,8 @@
   -->
 <version>
 	<application>medra</application>
-	<type>plugins.importexport</type>
-	<release>3.0.0.4</release>
-	<date>2023-05-04</date>
+	<type>plugins.generic</type>
+	<release>4.0.0.0</release>
+	<date>2023-10-23</date>
+  <class>MedraPlugin</class>
 </version>

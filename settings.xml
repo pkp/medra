@@ -2,7 +2,7 @@
 <!DOCTYPE plugin_settings SYSTEM "../../../lib/pkp/dtd/pluginSettings.dtd">
 
 <!--
-  * plugins/importexport/medra/settings.xml
+  * plugins/generic/medra/settings.xml
   *
   * Copyright (c) 2014-2023 Simon Fraser University
   * Copyright (c) 2003-2023 John Willinsky
@@ -17,11 +17,11 @@
 		<value></value>
 	</setting>
 	<setting type="string">
-		<name>fromCompany</name>
+		<name>fromName</name>
 		<value></value>
 	</setting>
 	<setting type="string">
-		<name>fromName</name>
+		<name>fromCompany</name>
 		<value></value>
 	</setting>
 	<setting type="string">
