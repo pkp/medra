@@ -11,32 +11,32 @@
   * Filter Configuration.
   -->
 <filterConfig>
-	<filterGroups>
-		<!-- mEDRA XML issue output -->
-		<filterGroup
-			symbolic="issue=>medra-xml"
-			displayName="plugins.importexport.medra.displayName"
-			description="plugins.importexport.medra.description"
-			inputType="class::classes.issue.Issue[]"
-			outputType="xml::schema(http://www.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd)" />
-		<!-- mEDRA XML article output -->
-		<filterGroup
-			symbolic="article=>medra-xml"
-			displayName="plugins.importexport.medra.displayName"
-			description="plugins.importexport.medra.description"
-			inputType="class::classes.submission.Submission[]"
-			outputType="xml::schema(http://www.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd)" />
-	</filterGroups>
-	<filters>
-		<!-- mEDRA XML issue output -->
-		<filter
-			inGroup="issue=>medra-xml"
-			class="APP\plugins\generic\medra\filter\IssueMedraXmlFilter"
-			isTemplate="0" />
-		<!-- mEDRA XML article output -->
-		<filter
-			inGroup="article=>medra-xml"
-			class="APP\plugins\generic\medra\filter\ArticleMedraXmlFilter"
-			isTemplate="0" />
-	</filters>
+    <filterGroups>
+        <!-- mEDRA XML issue output -->
+        <filterGroup
+            symbolic="issue=>medra-xml"
+            displayName="plugins.importexport.medra.displayName"
+            description="plugins.importexport.medra.description"
+            inputType="class::classes.issue.Issue[]"
+            outputType="xml::schema(http://www.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd)" />
+        <!-- mEDRA XML article output -->
+        <filterGroup
+            symbolic="article=>medra-xml"
+            displayName="plugins.importexport.medra.displayName"
+            description="plugins.importexport.medra.description"
+            inputType="class::classes.submission.Submission[]"
+            outputType="xml::schema(http://www.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd)" />
+    </filterGroups>
+    <filters>
+        <!-- mEDRA XML issue output -->
+        <filter
+            inGroup="issue=>medra-xml"
+            class="APP\plugins\generic\medra\filter\IssueMedraXmlFilter"
+            isTemplate="0" />
+        <!-- mEDRA XML article output -->
+        <filter
+            inGroup="article=>medra-xml"
+            class="APP\plugins\generic\medra\filter\ArticleMedraXmlFilter"
+            isTemplate="0" />
+    </filters>
 </filterConfig>

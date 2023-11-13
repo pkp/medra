@@ -10,11 +10,11 @@
 {extends file="layouts/backend.tpl"}
 
 {block name="page"}
-	<h1 class="app__pageHeading">
-		{$pageTitle}
-	</h1>
+    <h1 class="app__pageHeading">
+        {$pageTitle}
+    </h1>
 
-	{capture assign=doiManagementUrl}{url page="dois"}{/capture}
-	{capture assign=doiSettingsUrl}{url page="management" op="settings" path="distribution" anchor="dois"}{/capture}
-	<notification type="warning">{translate key="manager.dois.settings.relocated" doiManagementUrl=$doiManagementUrl doiSettingsUrl=$doiSettingsUrl}</notification>
+    {capture assign=doiManagementUrl}{url page="dois"}{/capture}
+    {capture assign=doiSettingsUrl}{url page="management" op="settings" path="distribution" anchor="dois"}{/capture}
+    <notification type="warning">{translate key="manager.dois.settings.relocated" doiManagementUrl=$doiManagementUrl doiSettingsUrl=$doiSettingsUrl}</notification>
 {/block}

@@ -103,8 +103,8 @@ class MedraSettings extends \PKP\doi\RegistrationAgencySettings
         });
 
         $exportIssueOptions = [
-			['value' => O4DOIXmlFilter::O4DOI_ISSUE_AS_WORK, 'label' => __('plugins.importexport.medra.settings.form.work')],
-			['value' => O4DOIXmlFilter::O4DOI_ISSUE_AS_MANIFESTATION, 'label' => __('plugins.importexport.medra.settings.form.manifestation')],
+            ['value' => O4DOIXmlFilter::O4DOI_ISSUE_AS_WORK, 'label' => __('plugins.importexport.medra.settings.form.work')],
+            ['value' => O4DOIXmlFilter::O4DOI_ISSUE_AS_MANIFESTATION, 'label' => __('plugins.importexport.medra.settings.form.manifestation')],
         ];
 
         return [

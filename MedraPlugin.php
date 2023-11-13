@@ -369,7 +369,6 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
             $pluginPathName = 'MedraExportPlugin';
             $this->_exportPlugin = PluginRegistry::getPlugin($pluginCategory, $pluginPathName);
             // If being run from CLI, there is no context, so plugin initialization would not have been fired
-            // Note: from the release 3.4 there is no possibility to run the plugin from CLI
             if ($this->_exportPlugin === null && !isset($_SERVER['SERVER_NAME'])) {
                 $this->_pluginInitialization();
                 $this->_exportPlugin = PluginRegistry::getPlugin($pluginCategory, $pluginPathName);
