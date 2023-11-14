@@ -72,6 +72,7 @@ msgstr "Prosimo, vnesite veljaven email naslov tehnične osebe."
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Prosimo, izberite državo, ki bo obveščena kot 'izdajateljska država' pri mEDRA."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Prosimo, izberite ali želite izvoziti številko kot <a href=\"https://www."

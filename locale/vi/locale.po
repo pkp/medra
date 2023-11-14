@@ -50,6 +50,7 @@ msgstr "Manifestation"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "Work"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Vui lòng chọn xem bạn có muốn xuất các số như <a href=\"http://www.medra.org/"

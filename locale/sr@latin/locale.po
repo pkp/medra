@@ -64,6 +64,7 @@ msgstr "Unesite ispravnu imejl adresu tehničkog kontakta."
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Odaberite zemlju."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr "Odaberite da li želite da jedinicu izvozite kao <a href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'radove' ili 'manifestacije'</a>."
 

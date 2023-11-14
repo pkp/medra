@@ -44,6 +44,7 @@ msgstr "манифестација"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "дело"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Ве молиме одберете дали сакате да ги експортирате изданијата како <a href=\""

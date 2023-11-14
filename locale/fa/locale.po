@@ -59,6 +59,7 @@ msgstr "لطفا یک ایمیل معتبر تماس فنی وارد کنید"
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "لطفا کشوری که به عنوان \"کشور ناشر\"  در mEDRA ثبت خواهد شد را انتخاب کنید."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr "لطفاً انتخاب کنید که می خواهید شماره ها به چه عنوانی برون دهی شوند: <a href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'کارها' or 'موارد نمایشی'</a>."
 

@@ -59,6 +59,7 @@ msgstr "manifestasjon"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "verk"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Velg om du vil eksportere utgaver som <a href=\"http://www.medra.org/en/"

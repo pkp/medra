@@ -61,6 +61,7 @@ msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr ""
 "Seleccione o país para ser indicado como \"país de publicação\" para o mEDRA."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Seleccione se pretende exportar números como <a href=\"https://www.medra.org/"

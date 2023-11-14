@@ -82,6 +82,7 @@ msgstr "Indtast en gyldig e-mail på teknisk kontaktperson."
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Vælg det land, som mEDRA skal angive som 'publikationsland'."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Vælg om du vil eksportere numre enten som <a href=\"https://www.medra.org/en/"

@@ -85,6 +85,7 @@ msgstr ""
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Lütfen mEDRA'ya 'yayınlan ülkeyi' olarak bildirilecek ülkeyi seçiniz."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Lütfen sayıları <a href=\"https://www.medra.org/en/metadata_td.htm\" target="

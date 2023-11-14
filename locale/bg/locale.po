@@ -84,6 +84,7 @@ msgstr "изглед (manifestation)"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "работа (work)"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Моля, изберете дали искате да експортирате броеве като <a href=\"http://www."

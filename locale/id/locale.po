@@ -72,6 +72,7 @@ msgstr "manifestasi"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "Karya"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Tentukan Anda ingin mengekspor issue sebagai <a href=\"http://www.medra.org/"

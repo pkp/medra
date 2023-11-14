@@ -79,6 +79,7 @@ msgstr "Inserisci un indirizzo email valido per il contatto tecnico."
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Scegli lo stato da inserire in mEDRA come 'Paese di pubblicazione'."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Scegli se esportare fascicoli come <a href=\"https://www.medra.org/en/"

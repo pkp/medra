@@ -80,6 +80,7 @@ msgstr "manifestaatio"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "työ"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Valitse haluatko viedä numeroita <a href=\"http://www.medra.org/en/"

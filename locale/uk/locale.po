@@ -78,6 +78,7 @@ msgstr "Будь ласка, вкажіть коректну адресу еле
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Будь ласка, вкажіть країну, яка буде відображена у mEDRA як 'держава публікації'."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr "Будь ласка, вкажіть як Ви хочете експортувати випуски: <a href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'works' або 'manifestations'</a>."
 
