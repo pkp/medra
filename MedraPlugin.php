@@ -24,6 +24,7 @@ use APP\plugins\IDoiRegistrationAgency;
 use APP\submission\Submission;
 use Illuminate\Support\Collection;
 use PKP\context\Context;
+use PKP\db\DAORegistry;
 use PKP\doi\RegistrationAgencySettings;
 use PKP\install\Installer;
 use PKP\plugins\GenericPlugin;
@@ -386,8 +387,16 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
     {
         /** @var Installer $installer */
         $installer = $args[0];
-        $migration = new MedraDoiDataMigration($installer, $this);
-        $migration->up();
+        $version = $installer->getCurrentVersion();
+        if ($version->getProduct() == 'medra' && $version->getProductType() == 'plugins.generic') {
+            /** @var VersionDAO $versionDao */
+            $versionDao = DAORegistry::getDAO('VersionDAO');
+            $installedPluginVersion = $versionDao->getCurrentVersion($version->getProductType(), $version->getProduct());
+            if (!$installedPluginVersion) {
+                $migration = new MedraDoiDataMigration($installer, $this);
+                $migration->up();
+            }
+        }
         return HOOK::CONTINUE;
     }
 }

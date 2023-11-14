@@ -18,7 +18,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use PKP\core\Core;
-use PKP\db\DAORegistry;
 use PKP\doi\Doi;
 use PKP\file\FileManager;
 use PKP\install\DowngradeNotSupportedException;
@@ -26,29 +25,13 @@ use PKP\install\Installer;
 
 class MedraDoiDataMigration extends Migration
 {
-    protected Installer $installer;
-
-    public function __construct(Installer $installer)
-    {
-        $this->installer = $installer;
-    }
 
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        if ($this->installer) {
-            $version = $this->installer->getCurrentVersion();
-            if ($version->getProduct() == 'medra' && $version->getProductType() == 'plugins.generic') {
-                /** @var VersionDAO $versionDao */
-                $versionDao = DAORegistry::getDAO('VersionDAO');
-                $installedPluginVersion = $versionDao->getCurrentVersion($version->getProductType(), $version->getProduct());
-                if (!$installedPluginVersion) {
-                    $this->migrateMedraSettings();
-                }
-            }
-        }
+        $this->migrateMedraSettings();
     }
 
     public function migrateMedraSettings(): void
