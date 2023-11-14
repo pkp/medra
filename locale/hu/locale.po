@@ -76,6 +76,7 @@ msgstr "Kérjük, írjon be az érvényes e-mail címét a technikai kapcsolatta
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Kérjük, hogy válassza ki azt az országot, amely a \"publikálási ország\" lesz a mEDRA számára."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr "Kérjük, hogy válassza ki, hogyan akar folyóiratszámot exportálni mint <a href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'munkák' or 'kinyilvánítások'</a>."
 

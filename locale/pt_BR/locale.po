@@ -70,6 +70,7 @@ msgstr "Informe um endereço de e-mail válido."
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Escolha o país a ser informado como 'país de publicação' para o mEDRA."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Escolha se deseja exportar edições como <a href=\"https://www.medra.org/en/"

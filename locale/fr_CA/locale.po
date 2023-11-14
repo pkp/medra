@@ -91,6 +91,7 @@ msgstr ""
 "Veuillez indiquer le pays désigné en tant que « pays de publication » dans "
 "mEDRA."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Veuillez choisir si vous voulez exporter les numéros en tant qu'<a href=\""

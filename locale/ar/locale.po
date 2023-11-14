@@ -72,6 +72,7 @@ msgstr "لطفاً، أدخل عنوان البريد الالكتروني ال�
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "لطفاً، إختر البلد الذي ستتم الإشارة إليه على أنه 'بلد النشر' لـ mEDRA."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "لطفاً، إختر فيما لو أردت تصدير أعداد المجلة بمثابة <a href=\""

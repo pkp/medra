@@ -69,6 +69,7 @@ msgstr "请输入一个有效的技术员联系邮箱。"
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "请选择一个国家作为 “出版国家”。"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr "你希望导出的文件为<a href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'作品' 或者 '证明'</a>。"
 

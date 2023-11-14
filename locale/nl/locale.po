@@ -68,6 +68,7 @@ msgstr "Geef een geldig e-mailadres voor de technische contactpersoon."
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Geef het land dat geïnformeerd moet worden als 'publication country' voor mEDRA."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr "Kies of u nummers wilt exporteren als <a href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'works' of 'manifestations'</a>."
 

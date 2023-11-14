@@ -71,6 +71,7 @@ msgstr "Vložte, prosím, platný e-mail pro technický kontakt."
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Zvolte, prosím, stát, který má být udán jako země publikace ('publication country') pro službu mEDRA."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Zvolte, zda chcete exportovat čísla jako <a href=\"https://www.medra.org/en/"

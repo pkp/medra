@@ -62,6 +62,7 @@ msgstr "manifestació"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "obra"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Escolliu si voleu exportar els números com a <a href=\"https://www.medra.org/"

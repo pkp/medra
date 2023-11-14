@@ -76,6 +76,7 @@ msgstr "մանիֆեստացիա"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "աշխատանք"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Խնդրում ենք ընտրել, թե արդյոք ցանկանում եք արտահանել թողարկումները որպես <a "

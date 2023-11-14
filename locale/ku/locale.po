@@ -51,6 +51,7 @@ msgstr "مانیفێستەکان"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "کار"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "تکایە ئەو ژمارەیە هەڵ بژێرە کە دەتەوێت هەناردەی بکەیت <a href=\""

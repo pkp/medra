@@ -51,6 +51,7 @@ msgstr "Manifestations"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "Travaux"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Veuillez choisir si vous souhaitez exporter les numéros en tant que <a href="

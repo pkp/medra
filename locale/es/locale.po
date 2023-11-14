@@ -70,6 +70,7 @@ msgstr "Introduzca un correo electrónico de contacto técnico válido."
 msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr "Elija el país que aparecerá como 'país de publicación' en mEDRA."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr "Elija si desea exportar los números como <a href=\"http://www.medra.org/en/metadata_td.htm\" target=\"_blank\">'obras' o 'manifestaciones'</a>."
 

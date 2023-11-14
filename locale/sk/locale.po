@@ -49,6 +49,7 @@ msgstr "manifestation"
 msgid "plugins.importexport.medra.settings.form.work"
 msgstr "work"
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "Zvoľte, či chcete exportovať čísla ako <a href=\"http://www.medra.org/en/"

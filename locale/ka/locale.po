@@ -83,6 +83,7 @@ msgstr ""
 "გთხოვთ, აირჩიოთ ქვეყანა, რომლის შესახებაც უნდა ეცნობოთ MEDRA– ს „"
 "გამომცემლობის ქვეყნად“."
 
+#, fuzzy
 msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
 msgstr ""
 "გთხოვთ, აირჩიოთ, გსურთ ექსპორტის საკითხი, როგორც <a href=\"http://www.medra."
