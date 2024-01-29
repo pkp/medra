@@ -1,2 +1,84 @@
+# Komronbek Tufliyev <komronbek773@gmail.com>, 2024.
 msgid ""
-msgstr "X-Generator: Weblate\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit"
+msgstr ""
+"PO-Revision-Date: 2024-01-30 16:39+0000\n"
+"Last-Translator: Komronbek Tufliyev <komronbek773@gmail.com>\n"
+"Language-Team: Uzbek <http://translate.pkp.sfu.ca/projects/plugins/medra/uz/>"
+"\n"
+"Language: uz@cyrillic\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.18.2\n"
+
+msgid "plugins.importexport.medra.settings.form.description"
+msgstr "mEDRA eksport plaginini sozlang:"
+
+msgid "plugins.importexport.medra.settings.form.username"
+msgstr "Foydalanuvchi nomi"
+
+msgid "plugins.importexport.medra.settings.form.usernameRequired"
+msgstr ""
+"Iltimos, mEDRA foydalanuvchi nomingizni kiriting. Foydalanuvchi nomida ikki "
+"nuqta boʻlmasligi mumkin."
+
+msgid "plugins.importexport.medra.settings.form.registrantName"
+msgstr "mEDRA da ro'yxatdan o'tgan muassasaning nomi"
+
+msgid "plugins.importexport.medra.settings.form.registrantNameRequired"
+msgstr "Iltimos, mEDRA da ro'yxatdan o'tgan muassasani kiriting."
+
+msgid "plugins.importexport.medra.settings.form.fromFields"
+msgstr "Texnik so'rovlar bo'lsa, mEDRA bilan bog'lanishi kerak bo'lgan shaxs:"
+
+msgid "plugins.importexport.medra.settings.form.fromCompany"
+msgstr "Tashkilot"
+
+msgid "plugins.importexport.medra.settings.form.fromCompanyRequired"
+msgstr ""
+"Iltimos, DOI eksporti uchun texnik javobgar bo'lgan muassasani kiriting ("
+"masalan, veb-serveringizni joylashtirgan muassasa)."
+
+msgid "plugins.importexport.medra.settings.form.fromName"
+msgstr "Bog'lanish uchun shaxs"
+
+msgid "plugins.importexport.medra.settings.form.fromEmail"
+msgstr "Email"
+
+msgid "plugins.importexport.medra.settings.form.fromEmailRequired"
+msgstr "Iltimos, to'g'ri texnik aloqa elektron pochta manzilini kiriting."
+
+msgid "plugins.importexport.medra.settings.form.publicationCountry"
+msgstr ""
+"Iltimos, mEDRAga “nashr qiladigan mamlakat” sifatida maʼlumot beriladigan "
+"mamlakatni tanlang."
+
+msgid "plugins.importexport.medra.displayName"
+msgstr "mEDRA Eksport/Ro‘yxatdan o‘tish plagini"
+
+msgid "plugins.importexport.medra.description"
+msgstr ""
+"Onix for DOI (O4DOI) formatida nashr, maqola va galley metamaʼlumotlarini "
+"eksport qiling va DOIʼlarni mEDRA roʻyxatga olish agentligida roʻyxatdan "
+"oʻtkazing."
+
+msgid "plugins.importexport.medra.intro"
+msgstr ""
+"Agar siz DOI’larni mEDRA’da ro‘yxatdan o‘tkazmoqchi bo‘lsangiz, olish uchun "
+"<a href=\"https://www.medra.org/en/guide.htm\" target=\"_blank\">mEDRA bosh "
+"sahifasi</a>dagi ko‘rsatmalarga amal qiling. foydalanuvchi nomi va parol.\n"
+"Agar sizda oʻz foydalanuvchi nomingiz va parolingiz boʻlmasa, siz hali ham "
+"mEDRA XML formatiga (DOI uchun Onix) eksport qilishingiz mumkin boʻladi, "
+"lekin siz DOIʼlaringizni OJS ichidan mEDRAʼda roʻyxatdan oʻtkaza olmaysiz.\n"
+"Esda tutingki, mEDRA roʻyxatga olish xizmati talablari tufayli parol oddiy "
+"matn sifatida saqlanadi, yaʼni shifrlanmaydi."
+
+msgid "plugins.importexport.medra.settings.form.fromNameRequired"
+msgstr "Iltimos, texnik aloqa shaxsini kiriting."
+
+msgid "plugins.importexport.medra.settings.form.exportIssuesAs"
+msgstr ""
+"Iltimos, Nashrlarni <a href=\"https://www.medra.org/en/metadata_td.htm\" "
+"target=\"_blank\">\"ishlar\" yoki \"manifestatsiyalar\"</a> sifatida eksport "
+"qilishni xohlaysizmi, tanlang."
