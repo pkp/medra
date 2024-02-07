@@ -432,7 +432,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         assert(!empty($nameBeforeKey));
         $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'NamesBeforeKey', htmlspecialchars($nameBeforeKey, ENT_COMPAT, 'UTF-8')));
         // Key names
-        if ($familyName = $author->getLocalizedData(Author::IDENTITY_SETTING_FAMILYNAME, $locale) != '') {
+        if (($familyName = $author->getLocalizedData(Author::IDENTITY_SETTING_FAMILYNAME, $locale)) != '') {
             $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($familyName, ENT_COMPAT, 'UTF-8')));
         } else {
             $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($personName, ENT_COMPAT, 'UTF-8')));
