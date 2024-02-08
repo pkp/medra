@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/medra/MedraPlugin.php
  *
- * Copyright (c) 2014-2023 Simon Fraser University
- * Copyright (c) 2003-2023 John Willinsky
+ * Copyright (c) 2014-2024 Simon Fraser University
+ * Copyright (c) 2003-2024 John Willinsky
  * Distributed under The MIT License. For full terms see the file LICENSE.
  *
  * @class MedraPlugin

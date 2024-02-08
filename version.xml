@@ -4,8 +4,8 @@
 <!--
   * plugins/generic/medra/version.xml
   *
-  * Copyright (c) 2014-2023 Simon Fraser University
-  * Copyright (c) 2003-2023 John Willinsky
+  * Copyright (c) 2014-2024 Simon Fraser University
+  * Copyright (c) 2003-2024 John Willinsky
   * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
   *
   * Plugin version information.
@@ -13,7 +13,7 @@
 <version>
   <application>medra</application>
   <type>plugins.generic</type>
-  <release>4.0.0.0</release>
-  <date>2023-11-14</date>
+  <release>4.0.0.1</release>
+  <date>2024-02-08</date>
   <class>MedraPlugin</class>
 </version>
