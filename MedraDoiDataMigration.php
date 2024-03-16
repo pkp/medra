@@ -163,17 +163,21 @@ class MedraDoiDataMigration extends Migration
             if ($agency === null) {
                 continue;
             }
-
+            // s. https://github.com/pkp/medra/issues/21 why we use upsert here
             DB::table('doi_settings')
-                ->insert([
-                    'doi_id' => $doiId,
-                    'setting_name' => 'registrationAgency',
-                    'setting_value' => $agency
-                ]);
+                ->upsert(
+                    [
+                        'doi_id' => $doiId,
+                        'setting_name' => 'registrationAgency',
+                        'setting_value' => $agency
+                    ],
+                    ['doi_id', 'locale', 'setting_name'],
+                    ['setting_value']
+                );
         }
 
         // 4. Clean up old settings
-        DB::table('publication_settings')
+        DB::table('submission_settings')
             ->whereIn('setting_name', ['medra::registeredDoi', 'medra::status'])
             ->delete();
 
