@@ -538,7 +538,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $citationListNode->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cl', $medraCitationNamespace);
         foreach($parsedCitations as $citation) {
             $articleCitationNode = $doc->createElementNS($medraCitationNamespace, 'ArticleCitation');
-            $articleCitationNode->setAttribute('key', $article->getCurrentPublication()->getData('pub-id::doi') . '_ref' . $citation->getData('seq'));
+            $articleCitationNode->setAttribute('key', $article->getCurrentPublication()->getDoi() . '_ref' . $citation->getData('seq'));
             $unstructuredCitationNode = $doc->createElementNS($medraCitationNamespace, 'UnstructuredCitation');
             $unstructuredCitationNode->appendChild($doc->createTextNode($citation->getData('rawCitation')));
             $articleCitationNode->appendChild($unstructuredCitationNode);
