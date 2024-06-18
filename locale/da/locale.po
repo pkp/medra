@@ -1,26 +1,26 @@
-# Alexandra Fogtmann-Schulz <alfo@kb.dk>, 2022.
+# Alexandra Fogtmann-Schulz <alfo@kb.dk>, 2022, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T11:05:41+00:00\n"
-"PO-Revision-Date: 2022-07-05 09:31+0000\n"
+"PO-Revision-Date: 2023-04-20 22:49+0000\n"
 "Last-Translator: Alexandra Fogtmann-Schulz <alfo@kb.dk>\n"
-"Language-Team: Danish <http://translate.pkp.sfu.ca/projects/plugins/medra/"
-"da_DK/>\n"
-"Language: da_DK\n"
+"Language-Team: Danish <http://translate.pkp.sfu.ca/projects/plugins/medra/da/"
+">\n"
+"Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9.1\n"
+"X-Generator: Weblate 4.13.1\n"
 
 msgid "plugins.importexport.medra.displayName"
 msgstr "mEDRA Eksport/Registrerings-plugin"
 
 msgid "plugins.importexport.medra.description"
 msgstr ""
-"Ekportér metadata fra nummer, artikel og publiceringsversion i Onix til DOI "
+"Eksportér metadata fra nummer, artikel og publiceringsversion i Onix til DOI "
 "(O4DOI)-format med mEDRA registreringsagentur."
 
 msgid "plugins.importexport.medra.cliUsage"
