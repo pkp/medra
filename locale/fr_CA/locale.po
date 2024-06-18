@@ -1,19 +1,20 @@
+# Marie-Hélène Vézina [UdeMontréal] <marie-helene.vezina@umontreal.ca>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-30T06:56:44-07:00\n"
-"PO-Revision-Date: 2020-01-28 23:48+0000\n"
-"Last-Translator: Marie-Hélène Vézina [UdeMontréal] <marie-"
-"helene.vezina@umontreal.ca>\n"
-"Language-Team: French (Canada) <http://translate.pkp.sfu.ca/projects/ojs/"
-"importexport-medra/fr_CA/>\n"
+"PO-Revision-Date: 2023-04-24 10:30+0000\n"
+"Last-Translator: Marie-Hélène Vézina [UdeMontréal] <marie-helene."
+"vezina@umontreal.ca>\n"
+"Language-Team: French (Canada) <http://translate.pkp.sfu.ca/projects/plugins/"
+"medra/fr_CA/>\n"
 "Language: fr_CA\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 3.9.1\n"
+"X-Generator: Weblate 4.13.1\n"
 
 msgid "plugins.importexport.medra.displayName"
 msgstr "Plugiciel d'exportation/ enregistrement mEDRA"
@@ -137,3 +138,25 @@ msgstr ""
 
 msgid "plugins.importexport.medra.senderTask.name"
 msgstr "Tâche d'enregistrement automatique mEDRA"
+
+msgid "plugins.importexport.medra.crossref.error.cause"
+msgstr ""
+"Cause : le fichier n'est pas conforme aux conditions de mEDRA et/ou Crossref."
+
+msgid "plugins.importexport.medra.crossref.error.number"
+msgstr "Nombre d'erreurs"
+
+msgid "plugins.importexport.medra.crossref"
+msgstr "Déposer sur Crossref. (Ce service doit être activé pour votre compte.)"
+
+msgid "plugins.importexport.medra.crossref.error.description"
+msgstr "DESCRIPTION"
+
+msgid "plugins.importexport.medra.crossref.error.code"
+msgstr "CODE"
+
+msgid "plugins.importexport.medra.crossref.error.element"
+msgstr "ÉLÉMENT"
+
+msgid "plugins.importexport.medra.crossref.error.details"
+msgstr "Les conditions suivantes n'ont pas été remplies"
