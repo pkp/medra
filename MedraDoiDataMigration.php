@@ -21,7 +21,6 @@ use PKP\core\Core;
 use PKP\doi\Doi;
 use PKP\file\FileManager;
 use PKP\install\DowngradeNotSupportedException;
-use PKP\install\Installer;
 
 class MedraDoiDataMigration extends Migration
 {
@@ -306,11 +305,6 @@ class MedraDoiDataMigration extends Migration
         DB::table('versions')
             ->where('product_type', '=', 'plugins.importexport')
             ->where('product', '=', 'medra')
-            ->delete();
-
-        // Remove scheduled task
-        DB::table('scheduled_tasks')
-            ->where('class_name', '=', 'plugins.importexport.medra.MedraInfoSender')
             ->delete();
 
         // Delete no-longer-in-use files for importExport plugin, in case there are still there.
