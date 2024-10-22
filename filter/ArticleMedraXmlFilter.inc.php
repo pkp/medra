@@ -220,7 +220,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		// Object locale precedence.
 		$objectLocalePrecedence = $this->getObjectLocalePrecedence($context, $article, $galley);
 		// Content Item (mandatory for articles)
-		$articleNode->appendChild($this->createContentItemNode($doc, $issue, $article, $galley, $objectLocalePrecedence));
+		$articleNode->appendChild($this->createContentItemNode($doc, $issue, $article, $galley, $doi, $objectLocalePrecedence));
 		return $articleNode;
 	}
 
@@ -230,10 +230,11 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 	 * @param $issue Issue
 	 * @param $article Submission
 	 * @param $galley ArticleGalley
+	 * @param $pubObjectDoi string
 	 * @param $objectLocalePrecedence array
 	 * @return DOMElement
 	 */
-	function createContentItemNode($doc, $issue, $article, $galley, $objectLocalePrecedence) {
+	function createContentItemNode($doc, $issue, $article, $galley, $pubObjectDoi, $objectLocalePrecedence) {
 		$deployment = $this->getDeployment();
 		$context = $deployment->getContext();
 		$plugin = $deployment->getPlugin();
@@ -383,7 +384,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$citationDao = DAORegistry::getDAO('CitationDAO'); /* @var $citationDao CitationDAO */
 		$parsedCitations = $citationDao->getByPublicationId($article->getCurrentPublication()->getId())->toArray();
 		if(!empty($parsedCitations)){
-			$this->appendCitationListNodes($doc, $contentItemNode, $article, $parsedCitations);
+			$this->appendCitationListNodes($doc, $contentItemNode, $pubObjectDoi, $parsedCitations);
 		}
 
 		return $contentItemNode;
@@ -523,17 +524,17 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 	 * Append the CitationList node with unstructured citations to the ContentItem data node.
 	 * @param $doc DOMDocument
 	 * @param $contentItemNode DOMElement
-	 * @param $article Article
+	 * @param $pubObjectDoi string
 	 * @param $parsedCitations array of Citations
 	 */
-	function appendCitationListNodes($doc, $contentItemNode, $article, $parsedCitations) {
+	function appendCitationListNodes($doc, $contentItemNode, $pubObjectDoi, $parsedCitations) {
 		$deployment = $this->getDeployment();
 		$medraCitationNamespace = 'http://www.medra.org/DOIMetadata/2.0/Citations';
 		$citationListNode = $doc->createElementNS($deployment->getNamespace(), 'cl:CitationList');
 		$citationListNode->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cl', $medraCitationNamespace);
 		foreach($parsedCitations as $citation) {
 			$articleCitationNode = $doc->createElementNS($medraCitationNamespace, 'ArticleCitation');
-			$articleCitationNode->setAttribute('key', $article->getCurrentPublication()->getData('pub-id::doi') . '_ref' . $citation->getData('seq'));
+			$articleCitationNode->setAttribute('key', $pubObjectDoi . '_ref' . $citation->getData('seq'));
 			$unstructuredCitationNode = $doc->createElementNS($medraCitationNamespace, 'UnstructuredCitation');
 			$unstructuredCitationNode->appendChild($doc->createTextNode($citation->getData('rawCitation')));
 			$articleCitationNode->appendChild($unstructuredCitationNode);
