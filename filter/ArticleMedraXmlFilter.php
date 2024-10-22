@@ -236,14 +236,14 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         // Object locale precedence.
         $objectLocalePrecedence = $this->getObjectLocalePrecedence($context, $article, $galley);
         // Content Item (mandatory for articles)
-        $articleNode->appendChild($this->createContentItemNode($doc, $issue, $article, $galley, $objectLocalePrecedence));
+        $articleNode->appendChild($this->createContentItemNode($doc, $issue, $article, $galley, $doi, $objectLocalePrecedence));
         return $articleNode;
     }
 
     /**
      * Create a content item node.
      */
-    function createContentItemNode(DOMDocument $doc, Issue $issue, Submission $article, ?Galley $galley, array $objectLocalePrecedence): DOMElement
+    function createContentItemNode(DOMDocument $doc, Issue $issue, Submission $article, ?Galley $galley, string $pubObjectDoi, array $objectLocalePrecedence): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -394,7 +394,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $citationDao = DAORegistry::getDAO('CitationDAO'); /** @var CitationDAO $citationDao */
         $parsedCitations = $citationDao->getByPublicationId($article->getCurrentPublication()->getId())->toArray();
         if(!empty($parsedCitations)){
-            $this->appendCitationListNodes($doc, $contentItemNode, $article, $parsedCitations);
+            $this->appendCitationListNodes($doc, $contentItemNode, $pubObjectDoi, $parsedCitations);
         }
 
         return $contentItemNode;
@@ -529,7 +529,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
     /**
      * Append the CitationList node with unstructured citations to the ContentItem data node.
      */
-    function appendCitationListNodes(DOMDocument $doc, DOMElement $contentItemNode, Submission $article, array $parsedCitations): void
+    function appendCitationListNodes(DOMDocument $doc, DOMElement $contentItemNode, string $pubObjectDoi, array $parsedCitations): void
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -538,7 +538,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $citationListNode->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:cl', $medraCitationNamespace);
         foreach($parsedCitations as $citation) {
             $articleCitationNode = $doc->createElementNS($medraCitationNamespace, 'ArticleCitation');
-            $articleCitationNode->setAttribute('key', $article->getCurrentPublication()->getDoi() . '_ref' . $citation->getData('seq'));
+            $articleCitationNode->setAttribute('key', $pubObjectDoi . '_ref' . $citation->getData('seq'));
             $unstructuredCitationNode = $doc->createElementNS($medraCitationNamespace, 'UnstructuredCitation');
             $unstructuredCitationNode->appendChild($doc->createTextNode($citation->getData('rawCitation')));
             $articleCitationNode->appendChild($unstructuredCitationNode);
