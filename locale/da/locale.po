@@ -1,10 +1,10 @@
-# Alexandra Fogtmann-Schulz <alfo@kb.dk>, 2022, 2023.
+# Alexandra Fogtmann-Schulz <alfo@kb.dk>, 2022, 2023, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T11:05:41+00:00\n"
-"PO-Revision-Date: 2023-04-20 22:49+0000\n"
+"PO-Revision-Date: 2024-11-21 07:14+0000\n"
 "Last-Translator: Alexandra Fogtmann-Schulz <alfo@kb.dk>\n"
 "Language-Team: Danish <http://translate.pkp.sfu.ca/projects/plugins/medra/da/"
 ">\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.13.1\n"
+"X-Generator: Weblate 4.18.2\n"
 
 msgid "plugins.importexport.medra.displayName"
 msgstr "mEDRA Eksport/Registrerings-plugin"
@@ -121,7 +121,9 @@ msgstr ""
 "Årsag: filen er ikke valid i forhold til mEDRA og/eller Crossref kravene."
 
 msgid "plugins.importexport.medra.crossref"
-msgstr "Deponér hos Crossref. (Denne tjeneste skal aktiveres i din konto.)"
+msgstr ""
+"Deponér også DOI'erne hos Crossref. (Denne mEDRA tjeneste skal aktiveres for "
+"din konto.)"
 
 msgid "plugins.importexport.medra.crossref.error.description"
 msgstr "BESKRIVELSE"
@@ -134,3 +136,31 @@ msgstr "KODE"
 
 msgid "plugins.importexport.medra.crossref.error.details"
 msgstr "Følgende krav blev ikke opfyldt"
+
+msgid "plugins.generic.medra.displayName"
+msgstr "mEDRA Ledelsesplugin"
+
+msgid "plugins.generic.medra.description"
+msgstr "Håndterer deponering og eksportering af mEDRA metadata"
+
+msgid "plugins.generic.medra.registrationAgency.name"
+msgstr "mEDRA"
+
+msgid "plugins.generic.medra.deposit.unsuccessful"
+msgstr "Registrering mislykkedes! Venligst tjek din konfiguration og prøv igen."
+
+msgid "plugins.importexport.medra.settings.description"
+msgstr ""
+"Konfigurer venligst mEDRA eksport-plugin'et før du anvender det første gang."
+
+msgid "plugins.importexport.medra.settings.label"
+msgstr "mEDRA indstillinger"
+
+msgid "plugins.importexport.medra.registrationAgency.name"
+msgstr "mEDRA"
+
+msgid "plugins.importexport.medra.settings.form.registrantName.label"
+msgstr "Registrants navn"
+
+msgid "plugins.importexport.medra.crossref.label"
+msgstr "Deponer hos Crossref"
