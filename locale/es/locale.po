@@ -1,12 +1,13 @@
 # Jordi LC <jordi.lacruz@uab.cat>, 2021, 2024.
 # Marc Bria <marc.bria@gmail.com>, 2023.
+# Darío Hereñú <magallania@gmail.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T11:05:41+00:00\n"
-"PO-Revision-Date: 2024-04-20 03:00+0000\n"
-"Last-Translator: Jordi LC <jordi.lacruz@uab.cat>\n"
+"PO-Revision-Date: 2024-11-21 07:14+0000\n"
+"Last-Translator: Darío Hereñú <magallania@gmail.com>\n"
 "Language-Team: Spanish <http://translate.pkp.sfu.ca/projects/plugins/medra/"
 "es/>\n"
 "Language: es\n"
@@ -131,4 +132,36 @@ msgstr ""
 
 msgid "plugins.importexport.medra.crossref"
 msgstr ""
-"Depositar en Crossref (es necesaria una cuenta para disfrutar del servicio)"
+"Deposite los DOI también con el Crossref. (Este servicio mEDRA debe estar "
+"habilitado para su cuenta.)"
+
+msgid "plugins.generic.medra.displayName"
+msgstr "Módulo Administrador mEDRA"
+
+msgid "plugins.generic.medra.deposit.unsuccessful"
+msgstr ""
+"El registro no se ha realizado correctamente. Por favor, compruebe su "
+"configuración e inténtelo de nuevo."
+
+msgid "plugins.importexport.medra.crossref.label"
+msgstr "Depósito a Crossref"
+
+msgid "plugins.generic.medra.description"
+msgstr "Gestiona el depósito y la exportación de metadatos mEDRA"
+
+msgid "plugins.generic.medra.registrationAgency.name"
+msgstr "mEDRA"
+
+msgid "plugins.importexport.medra.settings.description"
+msgstr ""
+"Configure el complemento de exportación mEDRA antes de utilizarlo por "
+"primera vez."
+
+msgid "plugins.importexport.medra.settings.label"
+msgstr "Configuración mEDRA"
+
+msgid "plugins.importexport.medra.registrationAgency.name"
+msgstr "mEDRA"
+
+msgid "plugins.importexport.medra.settings.form.registrantName.label"
+msgstr "Nombre del registrante"
