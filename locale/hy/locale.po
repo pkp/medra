@@ -1,17 +1,17 @@
 # Artashes Mirzoyan <amirzoyan@sci.am>, 2022.
-# Tigran Zargaryan <tigran@flib.sci.am>, 2022.
+# Tigran Zargaryan <tigran@flib.sci.am>, 2022, 2024.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-08-05 23:36+0000\n"
+"PO-Revision-Date: 2024-11-21 07:14+0000\n"
 "Last-Translator: Tigran Zargaryan <tigran@flib.sci.am>\n"
 "Language-Team: Armenian <http://translate.pkp.sfu.ca/projects/plugins/medra/"
-"hy_AM/>\n"
-"Language: hy_AM\n"
+"hy/>\n"
+"Language: hy\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.13.1\n"
+"X-Generator: Weblate 4.18.2\n"
 
 msgid "plugins.importexport.medra.cliUsage"
 msgstr ""
@@ -41,8 +41,8 @@ msgstr "Պատճառը. նիշքը վավեր չէ mEDRA-ի և/կամ Crossref-�
 
 msgid "plugins.importexport.medra.crossref"
 msgstr ""
-"Ավանդադրեք Crossref-ում: (Այս ծառայությունը պետք է միացված լինի ձեր հաշվի "
-"համար:)"
+"Ավանդադրեք նաև DOI-երը Crossref-ում: (Այս mEDRA ծառայությունը պետք է միացված "
+"լինի ձեր հաշվի համար:)"
 
 msgid "plugins.importexport.medra.senderTask.name"
 msgstr "mEDRA ինքնաշխատ գրանցման առաջադրանք"
@@ -146,3 +146,33 @@ msgstr ""
 
 msgid "plugins.importexport.medra.displayName"
 msgstr "mEDRA արտահանման/գրանցման պլագին"
+
+msgid "plugins.generic.medra.displayName"
+msgstr "mEDRA Manager փլագին"
+
+msgid "plugins.generic.medra.deposit.unsuccessful"
+msgstr ""
+"Գրանցումն անհաջող էր: Խնդրում ենք ստուգել ձեր կոնֆիգուրացիան և նորից փորձել:"
+
+msgid "plugins.importexport.medra.settings.form.registrantName.label"
+msgstr "Գրանցվողի անունը"
+
+msgid "plugins.importexport.medra.crossref.label"
+msgstr "Ավանդադրեք Crossref-ում"
+
+msgid "plugins.generic.medra.description"
+msgstr "Կառավարում է mEDRA մետատվյալների ավանդադրումը և արտահանումը"
+
+msgid "plugins.generic.medra.registrationAgency.name"
+msgstr "mEDRA"
+
+msgid "plugins.importexport.medra.settings.description"
+msgstr ""
+"Խնդրում ենք կարգավորել mEDRA արտահանման փլագինը, նախքան այն առաջին անգամ "
+"օգտագործելը:"
+
+msgid "plugins.importexport.medra.settings.label"
+msgstr "mEDRA Կարգավորումներ"
+
+msgid "plugins.importexport.medra.registrationAgency.name"
+msgstr "mEDRA"
