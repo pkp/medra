@@ -1,8 +1,9 @@
 # Teodora Fildishevska <t.fildishevska@gmail.com>, 2023.
+# Mirko Spiroski <mspiroski@id-press.eu>, 2024.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-03-16 09:48+0000\n"
-"Last-Translator: Teodora Fildishevska <t.fildishevska@gmail.com>\n"
+"PO-Revision-Date: 2024-11-21 07:14+0000\n"
+"Last-Translator: Mirko Spiroski <mspiroski@id-press.eu>\n"
 "Language-Team: Macedonian <http://translate.pkp.sfu.ca/projects/plugins/"
 "medra/mk/>\n"
 "Language: mk\n"
@@ -10,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n==1 || n%10==1 ? 0 : 1;\n"
-"X-Generator: Weblate 4.13.1\n"
+"X-Generator: Weblate 4.18.2\n"
 
 msgid "plugins.importexport.medra.cliUsage"
 msgstr ""
@@ -134,8 +135,8 @@ msgstr ""
 
 msgid "plugins.importexport.medra.crossref"
 msgstr ""
-"Депонирај до Crossref. (Оваа услуга мора да биде овозможена за вашата "
-"корисничка сметка.)"
+"Депонирајте ги DOI-овите и со Crossref. (Оваа услуга mEDRA мора да биде "
+"овозможена за вашата сметка.)"
 
 msgid "plugins.importexport.medra.workOrProduct"
 msgstr ""
@@ -149,3 +150,34 @@ msgid "plugins.importexport.medra.settings.form.publicationCountry"
 msgstr ""
 "Ве молиме да ја изберете земјата која ќе биде информирана како “земја на "
 "издавање' во mEDRA."
+
+msgid "plugins.generic.medra.displayName"
+msgstr "Приклучок за менаџер mEDRA"
+
+msgid "plugins.generic.medra.deposit.unsuccessful"
+msgstr ""
+"Регистрацијата не беше успешна! Проверете ја вашата конфигурација и обидете "
+"се повторно."
+
+msgid "plugins.generic.medra.description"
+msgstr "Се справува со депонирање и извоз на метаподатоци mEDRA"
+
+msgid "plugins.generic.medra.registrationAgency.name"
+msgstr "mEDRA"
+
+msgid "plugins.importexport.medra.settings.description"
+msgstr ""
+"Конфигурирајте го приклучокот за извоз на mEDRA пред да го користите за прв "
+"пат."
+
+msgid "plugins.importexport.medra.settings.label"
+msgstr "mEDRA поставки"
+
+msgid "plugins.importexport.medra.registrationAgency.name"
+msgstr "mEDRA"
+
+msgid "plugins.importexport.medra.settings.form.registrantName.label"
+msgstr "Име на регистрант"
+
+msgid "plugins.importexport.medra.crossref.label"
+msgstr "Депозит во Crossref"
