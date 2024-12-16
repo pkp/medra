@@ -488,7 +488,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $crawlerBasedCollectionNode = $doc->createElementNS($deployment->getNamespace(), 'Collection');
         $crawlerBasedCollectionNode->setAttribute('property', 'crawler-based');
         foreach ($galleys as $crawledGalley) {
-            $urlPath = [$article->getBestArticleId(), $crawledGalley->getBestGalleyId()];
+            $urlPath = [$article->getBestId(), $crawledGalley->getBestGalleyId()];
             $dispatcher = $this->_getDispatcher($request);
             $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true);
             //$resourceURL = $request->url($context->getPath(), 'article', 'download', $urlPath, null, null, true);
@@ -513,13 +513,13 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $textMiningCollectionNode = $doc->createElementNS($deployment->getNamespace(), 'Collection');
         $textMiningCollectionNode->setAttribute('property', 'text-mining');
         foreach ($galleys as $galley) {
-            $urlPath = [$article->getBestArticleId(), $galley->getBestGalleyId()];
+            $urlPath = [$article->getBestId(), $galley->getBestGalleyId()];
             $dispatcher = $this->_getDispatcher($request);
             $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true);
             //$resourceURL = $request->url($context->getPath(), 'article', 'download', $urlPath, null, null, true);
             $textMiningItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
             $resourceNode = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL));
-            if (!$galley->getRemoteURL()) $resourceNode->setAttribute('mime_type', $galley->getFileType());
+            if (!$galley->getData('urlRemote')) $resourceNode->setAttribute('mime_type', $galley->getFileType());
             $textMiningItemNode->appendChild($resourceNode);
             $textMiningCollectionNode->appendChild($textMiningItemNode);
         }
