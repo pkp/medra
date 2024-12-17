@@ -82,7 +82,7 @@ class MedraDoiDataMigration extends Migration
                 } elseif (isset($item['medra::registeredDoi'])) {
                     $status = Doi::STATUS_REGISTERED;
                 }
-                $statuses[$item['doi_id']] = ['status' => $status];
+                $statuses[$item['doi_id']] = ['status' => (int) $status];
                 $registrationAgencies[$item['doi_id']] = $registrationAgency;
             }
         }
@@ -90,7 +90,7 @@ class MedraDoiDataMigration extends Migration
         // 3. Insert updated statuses
         foreach ($statuses as $doiId => $insert) {
             DB::table('dois')
-                ->where('doi_id', '=', $doiId)
+                ->where('doi_id', '=', (string) $doiId)
                 ->update($insert);
         }
 
@@ -147,7 +147,7 @@ class MedraDoiDataMigration extends Migration
                 } elseif (isset($item['medra::registeredDoi'])) {
                     $status = Doi::STATUS_REGISTERED;
                 }
-                $statuses[$item['doi_id']] = ['status' => $status];
+                $statuses[$item['doi_id']] = ['status' => (int) $status];
                 $registrationAgencies[$item['doi_id']] = $registrationAgency;
             }
         }
@@ -155,7 +155,7 @@ class MedraDoiDataMigration extends Migration
         // 3. Insert updated statuses
         foreach ($statuses as $doiId => $insert) {
             DB::table('dois')
-                ->where('doi_id', '=', $doiId)
+                ->where('doi_id', '=', (string) $doiId)
                 ->update($insert);
         }
 
@@ -215,7 +215,7 @@ class MedraDoiDataMigration extends Migration
                 } elseif (isset($item['medra::registeredDoi'])) {
                     $status = Doi::STATUS_REGISTERED;
                 }
-                $statuses[$item['doi_id']] = ['status' => $status];
+                $statuses[$item['doi_id']] = ['status' => (int) $status];
                 $registrationAgencies[$item['doi_id']] = $registrationAgency;
             }
         }
@@ -223,7 +223,7 @@ class MedraDoiDataMigration extends Migration
         // 3. Insert updated statuses
         foreach ($statuses as $doiId => $insert) {
             DB::table('dois')
-                ->where('doi_id', '=', $doiId)
+                ->where('doi_id', '=', (string) $doiId)
                 ->update($insert);
         }
 
