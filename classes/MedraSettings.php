@@ -110,7 +110,7 @@ class MedraSettings extends \PKP\doi\RegistrationAgencySettings
         return [
             new FieldHTML('preamble', [
                 'label' => __('plugins.importexport.medra.settings.label'),
-                'description' => $this->_getPreambleText(),
+                'description' => $this->getPreambleText(),
             ]),
             new FieldText('registrantName', [
                 'label' => __('plugins.importexport.medra.settings.form.registrantName.label'),
@@ -175,7 +175,7 @@ class MedraSettings extends \PKP\doi\RegistrationAgencySettings
         ];
     }
 
-    protected function _getPreambleText(): string
+    protected function getPreambleText(): string
     {
         $text = '';
         $text .= '<p>' . __('plugins.importexport.medra.settings.description') . '</p>';

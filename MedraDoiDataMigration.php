@@ -24,7 +24,6 @@ use PKP\install\DowngradeNotSupportedException;
 
 class MedraDoiDataMigration extends Migration
 {
-
     /**
      * Run the migrations.
      */

@@ -27,7 +27,7 @@ In order to use the export into the ONIX4DOI XML format you will need to setup t
 To register DOIs with mEDRA from within OJS you will have to enter your username and password.
 If you do not enter or have your own username and password you'll still be able to export into the
 ONIX4DOI XML format but you cannot register your DOIs from within OJS.
-Please note, that the passowrd will be saved as plain text, i.e. not encrypted, due to mEDRA registration service requirements.
+Please note, that the password will be saved as plain text, i.e. not encrypted, due to mEDRA registration service requirements.
 To use the additional possibility to deposit the DOIs also with the Crossref, this mEDRA service will have to be enabled for your account.
 
 Version History
