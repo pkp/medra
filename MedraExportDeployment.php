@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file plugins/generic/medra/MedraExportDeployment.php
  *
@@ -18,27 +19,27 @@ use APP\plugins\PubObjectCache;
 use APP\plugins\generic\medra\MedraExportPlugin;
 use PKP\context\Context;
 
-
 class MedraExportDeployment
 {
-    public const MEDRA_XMLNS = 'http://www.editeur.org/onix/DOIMetadata/2.0';
-    public const MEDRA_XMLNS_XSI = 'http://www.w3.org/2001/XMLSchema-instance';
-    public const MEDRA_XSI_SCHEMAVERSION = '2.0';
-    public const MEDRA_XSI_SCHEMALOCATION = 'http://www.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd';
-    public const MEDRA_XSI_SCHEMALOCATION_DEV = 'http://www-medra-dev.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd';
+    public const string MEDRA_XMLNS = 'http://www.editeur.org/onix/DOIMetadata/2.0';
+    public const string MEDRA_XMLNS_XSI = 'http://www.w3.org/2001/XMLSchema-instance';
+    public const string MEDRA_XSI_SCHEMAVERSION = '2.0';
+    public const string MEDRA_XSI_SCHEMALOCATION = 'http://www.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd';
+    public const string MEDRA_XSI_SCHEMALOCATION_DEV = 'http://www-medra-dev.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd';
 
     /**
      * Get the plugin cache
      */
-    function getCache(): PubObjectCache
+    public function getCache(): PubObjectCache
     {
         return $this->plugin->getCache();
     }
 
-    function __construct(
+    public function __construct(
         public Context $context,
         public MedraExportPlugin $plugin
-    ) {}
+    ) {
+    }
 
     //
     // Deployment items for subclasses to override
@@ -46,7 +47,7 @@ class MedraExportDeployment
     /**
      * Get the namespace URN
      */
-    function getNamespace(): string
+    public function getNamespace(): string
     {
         return self::MEDRA_XMLNS;
     }
@@ -54,7 +55,7 @@ class MedraExportDeployment
     /**
      * Get the schema instance URN
      */
-    function getXmlSchemaInstance(): string
+    public function getXmlSchemaInstance(): string
     {
         return self::MEDRA_XMLNS_XSI;
     }
@@ -62,7 +63,7 @@ class MedraExportDeployment
     /**
      * Get the schema version
      */
-    function getXmlSchemaVersion(): string
+    public function getXmlSchemaVersion(): string
     {
         return self::MEDRA_XSI_SCHEMAVERSION;
     }
@@ -70,7 +71,7 @@ class MedraExportDeployment
     /**
      * Get the schema location URL
      */
-    function getXmlSchemaLocation(): string
+    public function getXmlSchemaLocation(): string
     {
         return $this->plugin->isTestMode($this->context) ? self::MEDRA_XSI_SCHEMALOCATION_DEV : self::MEDRA_XSI_SCHEMALOCATION;
     }
@@ -78,7 +79,7 @@ class MedraExportDeployment
     /**
      * Get the schema filename.
      */
-    function getSchemaFilename(): string
+    public function getSchemaFilename(): string
     {
         return $this->getXmlSchemaLocation();
     }
@@ -86,7 +87,7 @@ class MedraExportDeployment
     /**
      * Get the import/export context.
      */
-    function getContext(): Context
+    public function getContext(): Context
     {
         return $this->context;
     }
@@ -94,7 +95,7 @@ class MedraExportDeployment
     /**
      * Get the import/export plugin.
      */
-    function getPlugin(): MedraExportPlugin
+    public function getPlugin(): MedraExportPlugin
     {
         return $this->plugin;
     }

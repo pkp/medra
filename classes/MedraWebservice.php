@@ -17,31 +17,31 @@ namespace APP\plugins\generic\medra\classes;
 
 use APP\core\Application;
 use DOMDocument;
+use GuzzleHttp\Exception\RequestException;
 use PKP\core\PKPString;
 use PKP\xml\XMLNode;
 
-
 class MedraWebservice
 {
-    public const MEDRA_WS_ENDPOINT_DEV = 'https://www-medra-dev.medra.org/servlet/ws/medraWS';
-    public const MEDRA2CR_WS_ENDPOINT_DEV = 'https://www-medra-dev.medra.org/servlet/ws/CRProxy';
-    public const MEDRA_WS_ENDPOINT = 'https://www.medra.org/servlet/ws/medraWS';
-    public const MEDRA2CR_WS_ENDPOINT = 'https://www.medra.org/servlet/ws/CRProxy';
-    public const MEDRA_WS_RESPONSE_OK  = 200;
+    public const string MEDRA_WS_ENDPOINT_DEV = 'https://www-medra-dev.medra.org/servlet/ws/medraWS';
+    public const string MEDRA2CR_WS_ENDPOINT_DEV = 'https://www-medra-dev.medra.org/servlet/ws/CRProxy';
+    public const string MEDRA_WS_ENDPOINT = 'https://www.medra.org/servlet/ws/medraWS';
+    public const string MEDRA2CR_WS_ENDPOINT = 'https://www.medra.org/servlet/ws/CRProxy';
+    public const int MEDRA_WS_RESPONSE_OK  = 200;
 
     /** HTTP authentication credentials. */
-    public array $_auth;
+    public array $auth;
 
     /** The mEDRA web service endpoint. */
-    public string $_endpoint;
+    public string $endpoint;
 
     /**
      * Constructor
      */
-    function __construct(string $endpoint, string $login, string $password)
+    public function __construct(string $endpoint, string $login, string $password)
     {
-        $this->_endpoint = $endpoint;
-        $this->_auth = [$login, $password];
+        $this->endpoint = $endpoint;
+        $this->auth = [$login, $password];
     }
 
     /**
@@ -49,12 +49,12 @@ class MedraWebservice
      *
      * @return bool|string True for success, an error message otherwise.
     */
-    function upload(string $xml): bool|string
+    public function upload(string $xml): bool|string
     {
-        $attachmentId = $this->_getContentId('metadata');
+        $attachmentId = $this->getContentId('metadata');
         $attachment = array($attachmentId => $xml);
         $arg = "<med:contentID href=\"$attachmentId\" />";
-        return $this->_doRequest('upload', $arg, $attachment);
+        return $this->doRequest('upload', $arg, $attachment);
     }
 
     /**
@@ -62,24 +62,24 @@ class MedraWebservice
      *
      * @return bool|string True for success, an error message otherwise.
      */
-    function deposit(string $xml, string $lang = 'eng', string $accessMode = '01'): bool|string
+    public function deposit(string $xml, string $lang = 'eng', string $accessMode = '01'): bool|string
     {
-        $attachmentId = $this->_getContentId('metadata');
+        $attachmentId = $this->getContentId('metadata');
         $attachment = array($attachmentId => $xml);
         $arg = "<med:accessMode>" . $accessMode . "</med:accessMode>" .
-            "<med:language>" .$lang . "</med:language>" .
+            "<med:language>" . $lang . "</med:language>" .
             "<med:contentID>" . $attachmentId . "</med:contentID>";
-        return $this->_doRequest('deposit', $arg, $attachment);
+        return $this->doRequest('deposit', $arg, $attachment);
     }
 
     /**
      * mEDRA viewMetadata operation
      */
-    function viewMetadata($doi): bool|string
+    public function viewMetadata($doi): bool|string
     {
-        $doi = $this->_escapeXmlEntities($doi);
+        $doi = $this->escapeXmlEntities($doi);
         $arg = "<med:doi>$doi</med:doi>";
-        return $this->_doRequest('viewMetadata', $arg);
+        return $this->doRequest('viewMetadata', $arg);
     }
 
     /**
@@ -87,7 +87,7 @@ class MedraWebservice
      *
      * @return bool|string True for success, an error message otherwise.
      */
-    function _doRequest(string $action, string $arg, array $attachment = null): bool|string
+    private function doRequest(string $action, string $arg, ?array $attachment = null): bool|string
     {
         // Build the multipart SOAP message from scratch.
         $soapMessage =
@@ -99,14 +99,14 @@ class MedraWebservice
                 '</SOAP-ENV:Body>' .
             '</SOAP-ENV:Envelope>';
 
-        $soapMessageId = $this->_getContentId($action);
+        $soapMessageId = $this->getContentId($action);
         if ($attachment) {
             assert(count($attachment) == 1);
             $request =
                 "--MIME_boundary\r\n" .
-                $this->_getMimePart($soapMessageId, $soapMessage) .
+                $this->getMimePart($soapMessageId, $soapMessage) .
                 "--MIME_boundary\r\n" .
-                $this->_getMimePart(key($attachment), current($attachment)) .
+                $this->getMimePart(key($attachment), current($attachment)) .
                 "--MIME_boundary--\r\n";
             $contentType = 'multipart/related; type="text/xml"; boundary="MIME_boundary"';
         } else {
@@ -119,8 +119,8 @@ class MedraWebservice
         $document = new DOMDocument();
         // Make SOAP request.
         try {
-            $response = $httpClient->request('POST', $this->_endpoint, [
-                'auth' => $this->_auth,
+            $response = $httpClient->request('POST', $this->endpoint, [
+                'auth' => $this->auth,
                 'headers' => [
                     'SOAPAction' => $action,
                     'Content-Type' => $contentType,
@@ -128,7 +128,7 @@ class MedraWebservice
                 ],
                 'body' => $request,
             ]);
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
+        } catch (RequestException $e) {
             $result = $e->getMessage();
             if ($e->hasResponse()) {
                 $exceptionResponseContent = $e->getResponse()->getBody()->getContents();
@@ -154,8 +154,10 @@ class MedraWebservice
                 $document->loadXml($responseContent);
                 $returnCode = $document->getElementsByTagName('returnCode');
                 $statusCode = $document->getElementsByTagName('statusCode');
-                if (($returnCode->length > 0 && $returnCode->item(0)->textContent != 'success') ||
-                    ($statusCode->length > 0 && $statusCode->item(0)->textContent != 'SUCCESS')) {
+                if (
+                    ($returnCode->length > 0 && $returnCode->item(0)->textContent != 'success') ||
+                    ($statusCode->length > 0 && $statusCode->item(0)->textContent != 'SUCCESS')
+                ) {
                         $result = $responseContent;
                 }
             }
@@ -166,7 +168,7 @@ class MedraWebservice
     /**
      * Create a mime part with the given content.
      */
-    function _getMimePart(string $contentId, string $content): string
+    private function getMimePart(string $contentId, string $content): string
     {
         return
             "Content-Type: text/xml; charset=utf-8\r\n" .
@@ -178,7 +180,7 @@ class MedraWebservice
     /**
      * Create a globally unique MIME content ID.
      */
-    function _getContentId(string $prefix): string
+    private function getContentId(string $prefix): string
     {
         return $prefix . md5(uniqid()) . '@medra.org';
     }
@@ -186,7 +188,7 @@ class MedraWebservice
     /**
      * Escape XML entities.
      */
-    function _escapeXmlEntities(string $string): string
+    private function escapeXmlEntities(string $string): string
     {
         return XMLNode::xmlentities($string);
     }

@@ -14,14 +14,19 @@
  * @brief Test class for MedraWebservice.
  */
 
+namespace APP\plugins\generic\medra\functional;
+
+use DOMDocument;
 use PKP\tests\PKPTestCase;
 use APP\plugins\generic\medra\classes\MedraWebservice;
 use PKP\config\Config;
 
-class MedraWebserviceTest extends PKPTestCase {
-    private $ws;
+class MedraWebserviceTest extends PKPTestCase
+{
+    private MedraWebservice $ws;
 
-    protected function setUp() : void {
+    protected function setUp(): void
+    {
         // Retrieve and check configuration.
         $medraPassword = Config::getVar('debug', 'webtest_medra_pw');
         if (empty($medraPassword)) {
@@ -38,16 +43,18 @@ class MedraWebserviceTest extends PKPTestCase {
     /**
      * @covers MedraWebservice
      */
-    public function testUpload() {
+    public function testUpload()
+    {
         self::assertTrue($this->ws->upload($this->getTestData()));
     }
 
     /**
      * @covers MedraWebservice
      */
-    public function testUploadWithError() {
+    public function testUploadWithError()
+    {
         $metadata = str_replace('SerialVersion', 'UnknownElement', $this->getTestData());
-        $expectedError = "mEDRA: 500 - uploaded file is not valid: cvc-complex-type.2.4.a: ".
+        $expectedError = "mEDRA: 500 - uploaded file is not valid: cvc-complex-type.2.4.a: " .
             "Invalid content was found starting with element 'UnknownElement'. " .
             "One of '{\"http://www.editeur.org/onix/DOIMetadata/2.0\":SerialVersion}' is expected.";
         self::assertEquals($expectedError, $this->ws->upload($metadata));
@@ -56,7 +63,8 @@ class MedraWebserviceTest extends PKPTestCase {
     /**
      * @covers MedraWebservice
      */
-    public function testViewMetadata() {
+    public function testViewMetadata()
+    {
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->loadXML($this->getTestData());
         $elem = $dom->getElementsByTagName('DOISerialIssueWork')->item(0);
@@ -77,9 +85,9 @@ class MedraWebserviceTest extends PKPTestCase {
      * O4DOI data for testing.
      * @return string
      */
-    private function getTestData() {
+    private function getTestData()
+    {
         $sampleFile = './plugins/generic/medra/tests/functional/serial-issue-as-work.xml';
         return file_get_contents($sampleFile);
     }
 }
-

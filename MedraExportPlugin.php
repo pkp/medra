@@ -31,7 +31,6 @@ use PKP\file\FileManager;
 use PKP\file\TemporaryFileManager;
 use PKP\i18n\LocaleConversion;
 
-
 class MedraExportPlugin extends DOIPubIdExportPlugin
 {
     public function __construct(protected MedraPlugin $agencyPlugin)
@@ -42,7 +41,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc Plugin::getName()
      */
-    public function getName()
+    public function getName(): string
     {
         return 'MedraExportPlugin';
     }
@@ -50,7 +49,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc Plugin::getDisplayName()
      */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return __('plugins.importexport.medra.displayName');
     }
@@ -58,7 +57,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc Plugin::getDescription()
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return __('plugins.importexport.medra.description');
     }
@@ -66,7 +65,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc PubObjectsExportPlugin::getSubmissionFilter()
      */
-    public function getSubmissionFilter()
+    public function getSubmissionFilter(): string
     {
         return 'article=>medra-xml';
     }
@@ -74,7 +73,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc PubObjectsExportPlugin::getIssueFilter()
      */
-    public function getIssueFilter()
+    public function getIssueFilter(): string
     {
         return 'issue=>medra-xml';
     }
@@ -82,7 +81,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc PubObjectsExportPlugin::getRepresentationFilter()
      */
-    public function getRepresentationFilter()
+    public function getRepresentationFilter(): string
     {
         return 'galley=>medra-xml';
     }
@@ -90,7 +89,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc ImportExportPlugin::getPluginSettingsPrefix()
      */
-    public function getPluginSettingsPrefix()
+    public function getPluginSettingsPrefix(): string
     {
         return 'medra';
     }
@@ -106,7 +105,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc PubObjectsExportPlugin::getExportDeploymentClassName()
      */
-    public function getExportDeploymentClassName()
+    public function getExportDeploymentClassName(): string
     {
         return '\APP\plugins\generic\medra\MedraExportDeployment';
     }
@@ -186,7 +185,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
             $exportXml = $this->exportXML([$object], $filter, $context, $noValidation, $exportErrors);
             // Write the XML to a file.
             // export file name example: medra-20160723-160036-articles-1-1.xml
-            $objectFileNamePart = $this->_getObjectFileNamePart($object);
+            $objectFileNamePart = $this->getObjectFileNamePart($object);
             $exportFileName = $this->getExportFileName($this->getExportPath(), $objectFileNamePart, $context, '.xml');
             $fileManager->writeFile($exportFileName, $exportXml);
             // Deposit the XML file.
@@ -222,7 +221,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
      * @see PubObjectsExportPlugin::depositXML()
      * @param Submission|Issue $objects
      */
-    public function depositXML($objects, $context, $filename)
+    public function depositXML($objects, $context, $filename): array|bool
     {
         // Use a different endpoint for testing and production.
         // New endpoint: use a different endpoint if the user selected the checkbox to deposit also in Crossref.
@@ -253,10 +252,13 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
         $result = $crEnabled ? $ws->deposit($xml, $language) : $ws->upload($xml);
 
         if ($result === true) {
-            $this->_updateDepositStatus($objects, Doi::STATUS_REGISTERED);
+            $this->updateDepositStatus($objects, Doi::STATUS_REGISTERED);
             return true;
         } else {
-            if (!is_string($result)) return false; // When is this happening?
+            if (!is_string($result)) {
+                return false;
+            } // When is this happening?
+
             // Handle errors.
             $doc = new DOMDocument();
             $doc->loadXML($result);
@@ -265,10 +267,10 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
                 $errNo = $doc->getElementsByTagName('errorsNumber')->item(0)->textContent;
                 $errNodeList = $doc->getElementsByTagName('error');
                 $errors = array();
-                foreach($errNodeList as $errNode) {
+                foreach ($errNodeList as $errNode) {
                     $error = array();
-                    if($errNode->childNodes->length) {
-                        foreach($errNode->childNodes as $errChildNode) {
+                    if ($errNode->childNodes->length) {
+                        foreach ($errNode->childNodes as $errChildNode) {
                             $error[$errChildNode->nodeName] = $errChildNode->nodeValue;
                         }
                     }
@@ -276,11 +278,11 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
                 }
                 $status = Doi::STATUS_ERROR;
                 $errorMsg = $this->buildDepositErrorMsg($errNo, $errors, $xml);
-                $this->_updateDepositStatus($objects, $status, $errorMsg);
+                $this->updateDepositStatus($objects, $status, $errorMsg);
                 return false; // or a message?
             }
             $status = Doi::STATUS_ERROR;
-            $this->_updateDepositStatus($objects, $status, $result);
+            $this->updateDepositStatus($objects, $status, $result);
             return array(
                 array('plugins.importexport.common.register.error.mdsError', $result)
             );
@@ -298,7 +300,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
      *
      * @param Submission|Issue $object
      */
-    private function _updateDepositStatus(DataObject $object, string $status, string $failedMsg = null)
+    private function updateDepositStatus(DataObject $object, string $status, ?string $failedMsg = null): void
     {
         if ($object instanceof Submission) {
             $object = $object->getCurrentPublication();
@@ -327,12 +329,12 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
             __('plugins.importexport.medra.crossref.error.number') . ': ' . $errNo . PHP_EOL .
             __('plugins.importexport.medra.crossref.error.details') . ': ' . PHP_EOL . PHP_EOL;
 
-            foreach ($errors as $error) {
-                $errorMsg .=
-                    __('plugins.importexport.medra.crossref.error.code') . ': ' . $error['code'] . PHP_EOL .
-                    __('plugins.importexport.medra.crossref.error.element') . ': ' . $error['reference'] . PHP_EOL .
-                    __('plugins.importexport.medra.crossref.error.description') . ': ' . $error['description'] . PHP_EOL . PHP_EOL ;
-            }
+        foreach ($errors as $error) {
+            $errorMsg .=
+                __('plugins.importexport.medra.crossref.error.code') . ': ' . $error['code'] . PHP_EOL .
+                __('plugins.importexport.medra.crossref.error.element') . ': ' . $error['reference'] . PHP_EOL .
+                __('plugins.importexport.medra.crossref.error.description') . ': ' . $error['description'] . PHP_EOL . PHP_EOL ;
+        }
 
             $errorMsg .=
                 __("plugins.importexport.common.invalidXML") . ': ' . PHP_EOL .
@@ -341,14 +343,12 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
         return $errorMsg;
     }
 
-
-
     /**
      * Get the object file name part.
      *
      * @param Submission|Issue $object
      */
-    private function _getObjectFileNamePart(DataObject $object): string
+    private function getObjectFileNamePart(DataObject $object): string
     {
         if ($object instanceof Submission) {
             return 'articles-' . $object->getId();

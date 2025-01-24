@@ -15,19 +15,21 @@
 namespace APP\plugins\generic\medra\filter;
 
 use APP\core\Application;
+use APP\core\Request;
 use APP\issue\Issue;
 use APP\plugins\DOIPubIdExportPlugin;
 use APP\submission\Submission;
 use PKP\context\Context;
 use DOMDocument;
 use DOMElement;
+use PKP\core\Dispatcher;
 use PKP\core\PKPString;
 use PKP\facades\Locale;
+use PKP\filter\FilterGroup;
 use PKP\galley\Galley;
 use PKP\i18n\LocaleConversion;
 use PKP\plugins\importexport\native\filter\NativeExportFilter;
-use PKP\plugins\importexport\PKPNativeImportExportDeployment;
-
+use PKP\plugins\importexport\native\PKPNativeImportExportDeployment;
 
 abstract class O4DOIXmlFilter extends NativeExportFilter
 {
@@ -106,9 +108,9 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
 
     /**
      * Constructor
-     * @param \PKP\filter\FilterGroup $filterGroup
+     * @param FilterGroup $filterGroup
      */
-    function __construct($filterGroup)
+    public function __construct($filterGroup)
     {
         parent::__construct($filterGroup);
     }
@@ -116,7 +118,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Get whether the object exported is considered as work
      */
-    function isWork(Context $context, DOIPubIdExportPlugin $plugin): bool
+    public function isWork(Context $context, DOIPubIdExportPlugin $plugin): bool
     {
         return true;
     }
@@ -124,7 +126,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Get root node name
      */
-    abstract function getRootNodeName(): string;
+    abstract public function getRootNodeName(): string;
 
     //
     // Common filter functions
@@ -132,7 +134,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Create and return the root node.
      */
-    function createRootNode(DOMDocument $doc, string $rootNodeName): DOMElement
+    public function createRootNode(DOMDocument $doc, string $rootNodeName): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -145,7 +147,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Create and return the head node.
      */
-    function createHeadNode(DOMDocument $doc): DOMElement
+    public function createHeadNode(DOMDocument $doc): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -153,24 +155,25 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         $plugin = $deployment->getPlugin();
         $headNode = $doc->createElementNS($deployment->getNamespace(), 'Header');
         $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FromCompany', htmlspecialchars($plugin->getSetting($context->getId(), 'fromCompany'), ENT_COMPAT, 'UTF-8')));
-        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FromPerson',  htmlspecialchars($plugin->getSetting($context->getId(), 'fromName'), ENT_COMPAT, 'UTF-8')));
-        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FromEmail',  htmlspecialchars($plugin->getSetting($context->getId(), 'fromEmail'), ENT_COMPAT, 'UTF-8')));
-        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ToCompany',  'mEDRA'));
-        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SentDate',  date('YmdHi')));
+        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FromPerson', htmlspecialchars($plugin->getSetting($context->getId(), 'fromName'), ENT_COMPAT, 'UTF-8')));
+        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FromEmail', htmlspecialchars($plugin->getSetting($context->getId(), 'fromEmail'), ENT_COMPAT, 'UTF-8')));
+        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ToCompany', 'mEDRA'));
+        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SentDate', date('YmdHi')));
         // Message note
         $app = Application::get();
         $name = $app->getName();
         $version = $app->getCurrentVersion();
         $versionString = $version->getVersionString();
-        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'MessageNote',  "This dataset was exported with $name, version $versionString."));
+        $headNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'MessageNote', "This dataset was exported with $name, version $versionString."));
         return $headNode;
     }
 
     /**
      * Generate O4DOI serial publication node.
-     * @param string $epubFormat O4DOI_EPUB_FORMAT_*
+     *
+     * @param ?string $epubFormat O4DOI_EPUB_FORMAT_*
      */
-    function createSerialPublicationNode(DOMDocument $doc, array $journalLocalePrecedence, string $epubFormat = null): DOMElement
+    public function createSerialPublicationNode(DOMDocument $doc, array $journalLocalePrecedence, string $epubFormat = null): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -181,10 +184,10 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         $serialPublicationNode->appendChild($this->createSerialWorkNode($doc, $journalLocalePrecedence));
         // Electronic Serial Version
         $onlineIssn = $context->getData('onlineIssn') ?? '';
-        $serialPublicationNode->appendChild($this->createSerialVersionNode($doc,  $onlineIssn, self::O4DOI_PRODUCT_FORM_ELECTRONIC, $epubFormat));
+        $serialPublicationNode->appendChild($this->createSerialVersionNode($doc, $onlineIssn, self::O4DOI_PRODUCT_FORM_ELECTRONIC, $epubFormat));
         // Print Serial Version
         if (($printIssn = $context->getData('printIssn')) && $this->isWork($context, $plugin)) {
-            $serialPublicationNode->appendChild($this->createSerialVersionNode($doc,  $printIssn, self::O4DOI_PRODUCT_FORM_PRINT, null));
+            $serialPublicationNode->appendChild($this->createSerialVersionNode($doc, $printIssn, self::O4DOI_PRODUCT_FORM_PRINT, null));
         }
         return $serialPublicationNode;
     }
@@ -192,7 +195,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Generate O4DOI serial work node.
      */
-    function createSerialWorkNode(DOMDocument $doc, array $journalLocalePrecedence): DOMElement
+    public function createSerialWorkNode(DOMDocument $doc, array $journalLocalePrecedence): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -202,21 +205,22 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         // Title (mandatory)
         $journalTitles = $this->getTranslationsByPrecedence($context->getName(null), $journalLocalePrecedence);
         assert(!empty($journalTitles));
-        foreach($journalTitles as $locale => $journalTitle) {
+        foreach ($journalTitles as $locale => $journalTitle) {
             $serialWorkNode->appendChild($this->createTitleNode($doc, $locale, $journalTitle, self::O4DOI_TITLE_TYPE_FULL));
         }
         // Publisher
         $serialWorkNode->appendChild($this->createPublisherNode($doc, $journalLocalePrecedence));
         // Country of Publication (mandatory)
-        $serialWorkNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'CountryOfPublication',  htmlspecialchars($plugin->getSetting($context->getId(), 'publicationCountry'), ENT_COMPAT, 'UTF-8')));
+        $serialWorkNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'CountryOfPublication', htmlspecialchars($plugin->getSetting($context->getId(), 'publicationCountry'), ENT_COMPAT, 'UTF-8')));
         return $serialWorkNode;
     }
 
     /**
      * Create a title node.
+     *
      * @param string $titleType O4DOI_TITLE_TYPE_*
      */
-    function createTitleNode(DOMDocument $doc, string $locale, string $localizedTitle, string $titleType, string $localizedSubtitle = null): DOMElement
+    public function createTitleNode(DOMDocument $doc, string $locale, string $localizedTitle, string $titleType, string $localizedSubtitle = null): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -240,9 +244,10 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
 
     /**
      * Create a NameIdentifier node.
+     *
      * @param string $nameIDType O4DOI_NAME_IDENTIFIER_TYPE_*
      */
-    function createNameIdentifierNode(DOMDocument $doc, string $nameIDType, string $idValue): DOMElement
+    public function createNameIdentifierNode(DOMDocument $doc, string $nameIDType, string $idValue): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -257,7 +262,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Create a publisher node.
      */
-    function createPublisherNode(DOMDocument $doc, array $journalLocalePrecedence): DOMElement
+    public function createPublisherNode(DOMDocument $doc, array $journalLocalePrecedence): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -279,28 +284,34 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
 
     /**
      * Create a serial version node.
+     *
      * @param string $productForm O4DOI_PRODUCT_FORM_*
-     * @param string $epubFormat O4DOI_EPUB_FORMAT_*
+     * @param ?string $epubFormat O4DOI_EPUB_FORMAT_*
      */
-    function createSerialVersionNode(DOMDocument $doc, string $issn, string $productForm, string $epubFormat = null): DOMElement
+    public function createSerialVersionNode(DOMDocument $doc, string $issn, string $productForm, ?string $epubFormat = null): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
         $serialVersionNode = $doc->createElementNS($deployment->getNamespace(), 'SerialVersion');
+
         // Proprietary Journal Identifier
         if ($productForm == self::O4DOI_PRODUCT_FORM_ELECTRONIC) {
             $serialVersionNode->appendChild($this->createIdentifierNode($doc, 'Product', self::O4DOI_ID_TYPE_PROPRIETARY, $context->getId()));
         }
+
         // ISSN
         if (!empty($issn)) {
             $serialVersionNode->appendChild($this->createIdentifierNode($doc, 'Product', self::O4DOI_ID_TYPE_ISSN, $issn));
         }
+
         // Product Form
         $serialVersionNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ProductForm', $productForm));
         if ($productForm == self::O4DOI_PRODUCT_FORM_ELECTRONIC) {
             // ePublication Format
-            if ($epubFormat) $serialVersionNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'EpubFormat', $epubFormat));
+            if ($epubFormat) {
+                $serialVersionNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'EpubFormat', $epubFormat));
+            }
             // ePublication Format Description
             $serialVersionNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'EpubFormatDescription', 'Open Journal Systems (OJS)'));
         }
@@ -310,27 +321,31 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Create the journal issue node.
      */
-    function createJournalIssueNode(DOMDocument $doc, Issue $issue, array $journalLocalePrecedence): DOMElement
+    public function createJournalIssueNode(DOMDocument $doc, Issue $issue, array $journalLocalePrecedence): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $journalIssueNode = $doc->createElementNS($deployment->getNamespace(), 'JournalIssue');
+
         // Volume
         $volume = $issue->getVolume();
         if (!empty($volume) && $issue->getShowVolume()) {
             $journalIssueNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'JournalVolumeNumber', htmlspecialchars($volume, ENT_COMPAT, 'UTF-8')));
         }
+
         // Number
         $number = $issue->getNumber();
         if (!empty($number) && $issue->getShowNumber()) {
             $journalIssueNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'JournalIssueNumber', htmlspecialchars($number, ENT_COMPAT, 'UTF-8')));
         }
+
         // Identification
         $identification = $issue->getIssueIdentification();
         if (!empty($identification)) {
             $journalIssueNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'JournalIssueDesignation', htmlspecialchars($identification, ENT_COMPAT, 'UTF-8')));
         }
         assert(!(empty($number) && empty($identification)));
+
         // Nominal Year
         $year = (string) $issue->getYear();
         $yearlen = strlen($year);
@@ -341,7 +356,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
             if ($yearlen == 2) {
                 // Assume that the issue date will never be
                 // more than one year in the future.
-                if ((int)$year <= (int)date('y')+1) {
+                if ((int)$year <= (int)date('y') + 1) {
                     $year = '20' . $year;
                 } else {
                     $year = '19' . $year;
@@ -355,17 +370,20 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
 
     /**
      * Create a related work or product node.
+     *
      * @param string $relationCode O4DOI_RELATION_*
      */
-    function createRelatedNode(DOMDocument $doc, string $workOrProduct, string $relationCode, array $ids): DOMElement
+    public function createRelatedNode(DOMDocument $doc, string $workOrProduct, string $relationCode, array $ids): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $relatedNode = $doc->createElementNS($deployment->getNamespace(), "Related$workOrProduct");
+
         // Relation code (mandatory)
         $relatedNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'RelationCode', $relationCode));
+
         // Work/Product ID (mandatory)
-        foreach($ids as $idType => $id) {
+        foreach ($ids as $idType => $id) {
             $relatedNode->appendChild($this->createIdentifierNode($doc, $workOrProduct, $idType, $id));
         }
         return $relatedNode;
@@ -376,13 +394,15 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
      * @param string $workOrProduct "Work" or "Product"
      * @param string $idType O4DOI_ID_TYPE_*
      */
-    function createIdentifierNode(DOMDocument $doc, string $workOrProduct, string $idType, string $id): DOMElement
+    public function createIdentifierNode(DOMDocument $doc, string $workOrProduct, string $idType, string $id): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $productIdentifierNode = $doc->createElementNS($deployment->getNamespace(), "${workOrProduct}Identifier");
+
         // ID type (mandatory)
         $productIdentifierNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), "${workOrProduct}IDType", $idType));
+
         // ID (mandatory)
         $productIdentifierNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'IDValue', $id));
         return $productIdentifierNode;
@@ -391,30 +411,36 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Create an extent node.
      */
-    function createExtentNode(DOMDocument $doc, int $fileSize): DOMElement
+    public function createExtentNode(DOMDocument $doc, int $fileSize): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $extentNode = $doc->createElementNS($deployment->getNamespace(), 'Extent');
+
         // Extent type
         $extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentType', self::O4DOI_EXTENT_TYPE_FILESIZE));
+
         // Extent value
-        $extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentValue',  $fileSize));
+        $extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentValue', $fileSize));
+
         // Extent unit
         $extentNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ExtentUnit', self::O4DOI_EXTENT_UNIT_BYTES));
+
         return $extentNode;
-     }
+    }
 
      /**
       * Create a description text node.
       */
-    function createOtherTextNode(DOMDocument $doc, string $locale, string $description): DOMElement
+    public function createOtherTextNode(DOMDocument $doc, string $locale, string $description): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $otherTextNode = $doc->createElementNS($deployment->getNamespace(), 'OtherText');
+
         // Text Type
         $otherTextNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'TextTypeCode', self::O4DOI_TEXT_TYPE_MAIN_DESCRIPTION));
+
         // Text
         $language = LocaleConversion::get3LetterIsoFromLocale($locale);
         assert(!empty($language));
@@ -430,7 +456,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Get DOIStructuralType
      */
-    function getDOIStructuralType(): string
+    public function getDOIStructuralType(): string
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -445,17 +471,18 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
 
     /**
      * Identify the locale precedence for this export.
+     *
      * @return array A list of valid PKP locales in descending
      *  order of priority.
      */
-    function getObjectLocalePrecedence(Context $context, ?Submission $article, ?Galley $galley): array
+    public function getObjectLocalePrecedence(Context $context, ?Submission $article, ?Galley $galley): array
     {
         $locales = array();
         if (is_a($galley, 'Galley') && Locale::isLocaleValid($galley->getLocale())) {
             $locales[] = $galley->getLocale();
         }
         if (is_a($article, 'Submission')) {
-            if(Locale::isLocaleValid($article->getData('locale'))) {
+            if (Locale::isLocaleValid($article->getData('locale'))) {
                 $locales[] = $article->getData('locale');
             }
         }
@@ -468,8 +495,10 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         // Sort form locales alphabetically so that
         // we get a well-defined order.
         sort($formLocales);
-        foreach($formLocales as $formLocale) {
-            if (!in_array($formLocale, $locales)) $locales[] = $formLocale;
+        foreach ($formLocales as $formLocale) {
+            if (!in_array($formLocale, $locales)) {
+                $locales[] = $formLocale;
+            }
         }
 
         assert(!empty($locales));
@@ -479,20 +508,24 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     /**
      * Identify the primary translation from an array of
      * localized data.
-     * @param array $localizedData An array of localized
+     *
+     * @param ?array $localizedData An array of localized
      *  data (key: locale, value: localized data).
      * @param array $localePrecedence An array of locales
      *  by descending priority.
+     *
      * @return mixed|null The value of the primary locale
      *  or null if no primary translation could be found.
      */
-    function getPrimaryTranslation(?array $localizedData, array $localePrecedence)
+    public function getPrimaryTranslation(?array $localizedData, array $localePrecedence)
     {
         // Check whether we have localized data at all.
-        if (!is_array($localizedData) || empty($localizedData)) return null;
+        if (!is_array($localizedData) || empty($localizedData)) {
+            return null;
+        }
 
         // Try all locales from the precedence list first.
-        foreach($localePrecedence as $locale) {
+        foreach ($localePrecedence as $locale) {
             if (isset($localizedData[$locale]) && !empty($localizedData[$locale])) {
                 return $localizedData[$locale];
             }
@@ -501,8 +534,10 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         // As a fallback: use any translation by alphabetical
         // order of locales.
         ksort($localizedData);
-        foreach($localizedData as $locale => $value) {
-            if (!empty($value)) return $value;
+        foreach ($localizedData as $locale => $value) {
+            if (!empty($value)) {
+                return $value;
+            }
         }
 
         // If we found nothing (how that?) return null.
@@ -511,21 +546,23 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
 
     /**
      * Re-order localized data by locale precedence.
-     * @param array $localizedData An array of localized
+     * @param ?array $localizedData An array of localized
      *  data (key: locale, value: localized data).
      * @param array $localePrecedence An array of locales
      *  by descending priority.
      * @return array Re-ordered localized data.
      */
-    function getTranslationsByPrecedence(?array $localizedData, array $localePrecedence): array
+    public function getTranslationsByPrecedence(?array $localizedData, array $localePrecedence): array
     {
         $reorderedLocalizedData = array();
 
         // Check whether we have localized data at all.
-        if (!is_array($localizedData) || empty($localizedData)) return $reorderedLocalizedData;
+        if (!is_array($localizedData) || empty($localizedData)) {
+            return $reorderedLocalizedData;
+        }
 
         // Order by explicit locale precedence first.
-        foreach($localePrecedence as $locale) {
+        foreach ($localePrecedence as $locale) {
             if (isset($localizedData[$locale]) && !empty($localizedData[$locale])) {
                 $reorderedLocalizedData[$locale] = $localizedData[$locale];
             }
@@ -535,15 +572,13 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         // Order any remaining values alphabetically by locale
         // and amend the re-ordered array.
         ksort($localizedData);
-        $reorderedLocalizedData = array_merge($reorderedLocalizedData, $localizedData);
-
-        return $reorderedLocalizedData;
+        return array_merge($reorderedLocalizedData, $localizedData);
     }
 
     /**
      * Helper to ensure dispatcher is available even when called from CLI tools
      */
-    protected function _getDispatcher(\APP\core\Request $request): \PKP\core\Dispatcher
+    protected function getDispatcher(Request $request): Dispatcher
     {
         $dispatcher = $request->getDispatcher();
         if ($dispatcher === null) {

@@ -31,17 +31,17 @@ use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
 use PKP\plugins\PluginRegistry;
 use PKP\services\PKPSchemaService;
-
+use PKP\site\VersionDAO;
 
 class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
 {
-    private ?MedraExportPlugin $_exportPlugin = null;
+    private ?MedraExportPlugin $exportPlugin = null;
     private MedraSettings $settingsObject;
 
     /**
      * @see Plugin::getDisplayName()
      */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return __('plugins.generic.medra.displayName');
     }
@@ -49,7 +49,7 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
     /**
      * @see Plugin::getDescription()
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return __('plugins.generic.medra.description');
     }
@@ -72,7 +72,7 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
             }
 
             if ($this->getEnabled($mainContextId)) {
-                $this->_pluginInitialization();
+                $this->pluginInitialization();
             }
         }
 
@@ -101,27 +101,29 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
 
     /**
      * Provides submissions metadata in ONIX4DOI format for download
+     *
      * @param Submission[] $submissions
      */
     public function exportSubmissions(array $submissions, Context $context): array
     {
         // Get filter and set objectsFileNamePart (see: PubObjectsExportPlugin::prepareAndExportPubObjects)
-        $filterName = $this->_exportPlugin->getSubmissionFilter();
+        $filterName = $this->exportPlugin->getSubmissionFilter();
         $xmlErrors = [];
 
-        $temporaryFileId = $this->_exportPlugin->exportAsDownload($context, $submissions, $filterName, 'articles', null, $xmlErrors);
+        $temporaryFileId = $this->exportPlugin->exportAsDownload($context, $submissions, $filterName, 'articles', null, $xmlErrors);
         return ['temporaryFileId' => $temporaryFileId, 'xmlErrors' => $xmlErrors];
     }
 
     /**
      * Registers submissions DOIs
+     *
      * @param Submission[] $submissions
      */
     public function depositSubmissions(array $submissions, Context $context): array
     {
-        $filterName = $this->_exportPlugin->getSubmissionFilter();
+        $filterName = $this->exportPlugin->getSubmissionFilter();
         $responseMessage = '';
-        $status = $this->_exportPlugin->exportAndDeposit($context, $submissions, $filterName, $responseMessage);
+        $status = $this->exportPlugin->exportAndDeposit($context, $submissions, $filterName, $responseMessage);
 
         return [
             'hasErrors' => !$status,
@@ -131,27 +133,29 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
 
     /**
      * Provides issues metadata in ONIX4DOI format for download
+     *
      * @param Issue[] $issues
      */
     public function exportIssues(array $issues, Context $context): array
     {
         // Get filter and set objectsFileNamePart (see: PubObjectsExportPlugin::prepareAndExportPubObjects)
-        $filterName = $this->_exportPlugin->getIssueFilter();
+        $filterName = $this->exportPlugin->getIssueFilter();
         $xmlErrors = [];
 
-        $temporaryFileId = $this->_exportPlugin->exportAsDownload($context, $issues, $filterName, 'issues', null, $xmlErrors);
+        $temporaryFileId = $this->exportPlugin->exportAsDownload($context, $issues, $filterName, 'issues', null, $xmlErrors);
         return ['temporaryFileId' => $temporaryFileId, 'xmlErrors' => $xmlErrors];
     }
 
     /**
      * Registers issues DOIs
+     *
      * @param Issue[] $issues
      */
     public function depositIssues(array $issues, Context $context): array
     {
-        $filterName = $this->_exportPlugin->getIssueFilter();
+        $filterName = $this->exportPlugin->getIssueFilter();
         $responseMessage = '';
-        $status = $this->_exportPlugin->exportAndDeposit($context, $issues, $filterName, $responseMessage);
+        $status = $this->exportPlugin->exportAndDeposit($context, $issues, $filterName, $responseMessage);
 
         return [
             'hasErrors' => !$status,
@@ -218,7 +222,7 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
     public function addRegistrationAgencyName(string $hookName, array $args): bool
     {
         $config = &$args[0];
-        $config['registrationAgencyNames'][$this->_exportPlugin->getName()] = $this->getRegistrationAgencyName();
+        $config['registrationAgencyNames'][$this->exportPlugin->getName()] = $this->getRegistrationAgencyName();
         return HOOK::CONTINUE;
     }
 
@@ -345,10 +349,10 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
     /**
      * Helper to register hooks that are used in normal plugin setup.
      */
-    private function _pluginInitialization()
+    private function pluginInitialization()
     {
         PluginRegistry::register('importexport', new MedraExportPlugin($this), $this->getPluginPath());
-        $this->_exportPlugin = PluginRegistry::getPlugin('importexport', 'MedraExportPlugin');
+        $this->exportPlugin = PluginRegistry::getPlugin('importexport', 'MedraExportPlugin');
 
         Hook::add('DoiSettingsForm::setEnabledRegistrationAgencies', [$this, 'addAsRegistrationAgencyOption']);
         Hook::add('DoiSetupSettingsForm::getObjectTypes', [$this, 'addAllowedObjectTypes']);
