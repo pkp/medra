@@ -21,11 +21,11 @@ use PKP\context\Context;
 
 class MedraExportDeployment
 {
-    public const string MEDRA_XMLNS = 'http://www.editeur.org/onix/DOIMetadata/2.0';
-    public const string MEDRA_XMLNS_XSI = 'http://www.w3.org/2001/XMLSchema-instance';
-    public const string MEDRA_XSI_SCHEMAVERSION = '2.0';
-    public const string MEDRA_XSI_SCHEMALOCATION = 'http://www.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd';
-    public const string MEDRA_XSI_SCHEMALOCATION_DEV = 'http://www-medra-dev.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd';
+    public const MEDRA_XMLNS = 'http://www.editeur.org/onix/DOIMetadata/2.0';
+    public const MEDRA_XMLNS_XSI = 'http://www.w3.org/2001/XMLSchema-instance';
+    public const MEDRA_XSI_SCHEMAVERSION = '2.0';
+    public const MEDRA_XSI_SCHEMALOCATION = 'http://www.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd';
+    public const MEDRA_XSI_SCHEMALOCATION_DEV = 'http://www-medra-dev.medra.org/schema/onix/DOIMetadata/2.0/ONIX_DOIMetadata_2.0.xsd';
 
     /**
      * Get the plugin cache

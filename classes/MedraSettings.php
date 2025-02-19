@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/medra/classes/MedraSetting.php
  *
- * Copyright (c) 2014-2024 Simon Fraser University
- * Copyright (c) 2003-2024 John Willinsky
+ * Copyright (c) 2014-2025 Simon Fraser University
+ * Copyright (c) 2003-2025 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class MedraSettings
@@ -20,9 +20,10 @@ use PKP\components\forms\FieldOptions;
 use PKP\components\forms\FieldSelect;
 use PKP\components\forms\FieldText;
 use PKP\context\Context;
+use PKP\doi\RegistrationAgencySettings;
 use PKP\facades\Locale;
 
-class MedraSettings extends \PKP\doi\RegistrationAgencySettings
+class MedraSettings extends RegistrationAgencySettings
 {
     public function getSchema(): \stdClass
     {
@@ -177,8 +178,7 @@ class MedraSettings extends \PKP\doi\RegistrationAgencySettings
 
     protected function getPreambleText(): string
     {
-        $text = '';
-        $text .= '<p>' . __('plugins.importexport.medra.settings.description') . '</p>';
+        $text = '<p>' . __('plugins.importexport.medra.settings.description') . '</p>';
         $text .= '<p>' . __('plugins.importexport.medra.intro') . '</p>';
         return $text;
     }

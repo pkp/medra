@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/medra/classes/MedraWebservice.php
  *
- * Copyright (c) 2014-2024 Simon Fraser University
- * Copyright (c) 2003-2024 John Willinsky
+ * Copyright (c) 2014-2025 Simon Fraser University
+ * Copyright (c) 2003-2025 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class MedraWebservice
@@ -18,16 +18,15 @@ namespace APP\plugins\generic\medra\classes;
 use APP\core\Application;
 use DOMDocument;
 use GuzzleHttp\Exception\RequestException;
-use PKP\core\PKPString;
 use PKP\xml\XMLNode;
 
 class MedraWebservice
 {
-    public const string MEDRA_WS_ENDPOINT_DEV = 'https://www-medra-dev.medra.org/servlet/ws/medraWS';
-    public const string MEDRA2CR_WS_ENDPOINT_DEV = 'https://www-medra-dev.medra.org/servlet/ws/CRProxy';
-    public const string MEDRA_WS_ENDPOINT = 'https://www.medra.org/servlet/ws/medraWS';
-    public const string MEDRA2CR_WS_ENDPOINT = 'https://www.medra.org/servlet/ws/CRProxy';
-    public const int MEDRA_WS_RESPONSE_OK  = 200;
+    public const MEDRA_WS_ENDPOINT_DEV = 'https://www-medra-dev.medra.org/servlet/ws/medraWS';
+    public const MEDRA2CR_WS_ENDPOINT_DEV = 'https://www-medra-dev.medra.org/servlet/ws/CRProxy';
+    public const MEDRA_WS_ENDPOINT = 'https://www.medra.org/servlet/ws/medraWS';
+    public const MEDRA2CR_WS_ENDPOINT = 'https://www.medra.org/servlet/ws/CRProxy';
+    public const MEDRA_WS_RESPONSE_OK  = 200;
 
     /** HTTP authentication credentials. */
     public array $auth;
@@ -149,7 +148,7 @@ class MedraWebservice
             if (!$attachment && $action == 'viewMetadata') {
                 $parts = explode("\r\n\r\n", $responseContent);
                 $result = array_pop($parts);
-                $result = PKPString::regexp_replace('/>[^>]*$/', '>', $result);
+                $result = preg_replace('/>[^>]*$/u', '>', $result);
             } else {
                 $document->loadXml($responseContent);
                 $returnCode = $document->getElementsByTagName('returnCode');
@@ -158,7 +157,7 @@ class MedraWebservice
                     ($returnCode->length > 0 && $returnCode->item(0)->textContent != 'success') ||
                     ($statusCode->length > 0 && $statusCode->item(0)->textContent != 'SUCCESS')
                 ) {
-                        $result = $responseContent;
+                    $result = $responseContent;
                 }
             }
         }

@@ -27,6 +27,7 @@ use PKP\citation\CitationDAO;
 use PKP\context\Context;
 use PKP\core\PKPString;
 use PKP\db\DAORegistry;
+use PKP\filter\FilterGroup;
 use PKP\galley\Galley;
 use PKP\i18n\LocaleConversion;
 use PKP\plugins\importexport\native\PKPNativeImportExportDeployment;
@@ -36,7 +37,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
 {
     /**
      * Constructor
-     * @param \PKP\filter\FilterGroup $filterGroup
+     * @param FilterGroup $filterGroup
      */
     public function __construct($filterGroup)
     {
@@ -155,7 +156,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOI', htmlspecialchars($doi, ENT_COMPAT, 'UTF-8')));
 
         // DOI URL (mandatory)
-        $urlPath = $article->getBestId();
+        $urlPath = [$article->getBestId()];
         if ($galley) {
             $urlPath = [$article->getBestId(), $galley->getBestGalleyId()];
         }
@@ -163,7 +164,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $url = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'view', $urlPath, null, null, true);
         if ($plugin->isTestMode($context)) {
             // Change server domain for testing.
-            $url = PKPString::regexp_replace('#://[^\s]+/index.php#', '://example.com/index.php', $url);
+            $url = preg_replace('#://[^\s]+/index.php#u', '://example.com/index.php', $url);
         }
         $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIWebsiteLink', $url));
 
@@ -474,7 +475,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'PersonNameInverted', htmlspecialchars($invertedPersonName, ENT_COMPAT, 'UTF-8')));
 
         // Names before key
-        $locale = $author->getSubmissionLocale();
+        $locale = $author->getData('submissionLocale');
         $nameBeforeKey = $author->getLocalizedData(Author::IDENTITY_SETTING_GIVENNAME, $locale);
         assert(!empty($nameBeforeKey));
         $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'NamesBeforeKey', htmlspecialchars($nameBeforeKey, ENT_COMPAT, 'UTF-8')));
@@ -507,7 +508,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
      *
      * @param string $subjectSchemeId O4DOI_SUBJECT_SCHEME_*
      */
-    public function createSubjectNode(DOMDocument $doc, string $subjectSchemeId, string $subjectHeadingOrCode, string $subjectSchemeName = null): DOMElement
+    public function createSubjectNode(DOMDocument $doc, string $subjectSchemeId, string $subjectHeadingOrCode, ?string $subjectSchemeName = null): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();

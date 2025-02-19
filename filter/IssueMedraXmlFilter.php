@@ -23,7 +23,6 @@ use APP\submission\Submission;
 use DOMDocument;
 use DOMElement;
 use PKP\context\Context;
-use PKP\core\PKPString;
 use PKP\db\DAORegistry;
 use PKP\filter\FilterGroup;
 use PKP\galley\Galley;
@@ -120,7 +119,7 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter
         $url = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'issue', 'view', $pubObject->getBestIssueId(), null, null, true);
         if ($plugin->isTestMode($context)) {
             // Change server domain for testing.
-            $url = PKPString::regexp_replace('#://[^\s]+/index.php#', '://example.com/index.php', $url);
+            $url = preg_replace('#://[^\s]+/index.php#u', '://example.com/index.php', $url);
         }
         $issueNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIWebsiteLink', $url));
 

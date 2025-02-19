@@ -105,7 +105,6 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     public const O4DOI_RELATION_IS_MANIFESTED_IN = '89';
     public const O4DOI_RELATION_IS_A_MANIFESTATION_OF = '90';
 
-
     /**
      * Constructor
      * @param FilterGroup $filterGroup
@@ -203,7 +202,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         $plugin = $deployment->getPlugin();
         $serialWorkNode = $doc->createElementNS($deployment->getNamespace(), 'SerialWork');
         // Title (mandatory)
-        $journalTitles = $this->getTranslationsByPrecedence($context->getName(null), $journalLocalePrecedence);
+        $journalTitles = $this->getTranslationsByPrecedence($context->getName(), $journalLocalePrecedence);
         assert(!empty($journalTitles));
         foreach ($journalTitles as $locale => $journalTitle) {
             $serialWorkNode->appendChild($this->createTitleNode($doc, $locale, $journalTitle, self::O4DOI_TITLE_TYPE_FULL));
@@ -398,10 +397,10 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
-        $productIdentifierNode = $doc->createElementNS($deployment->getNamespace(), "${workOrProduct}Identifier");
+        $productIdentifierNode = $doc->createElementNS($deployment->getNamespace(), "{$workOrProduct}Identifier");
 
         // ID type (mandatory)
-        $productIdentifierNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), "${workOrProduct}IDType", $idType));
+        $productIdentifierNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), "{$workOrProduct}IDType", $idType));
 
         // ID (mandatory)
         $productIdentifierNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'IDValue', $id));
@@ -429,9 +428,9 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         return $extentNode;
     }
 
-     /**
-      * Create a description text node.
-      */
+    /**
+     * Create a description text node.
+     */
     public function createOtherTextNode(DOMDocument $doc, string $locale, string $description): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
@@ -580,11 +579,6 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
      */
     protected function getDispatcher(Request $request): Dispatcher
     {
-        $dispatcher = $request->getDispatcher();
-        if ($dispatcher === null) {
-            $dispatcher = Application::get()->getDispatcher();
-        }
-
-        return $dispatcher;
+        return $request->getDispatcher() ?? Application::get()->getDispatcher();
     }
 }
