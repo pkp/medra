@@ -487,12 +487,19 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($personName, ENT_COMPAT, 'UTF-8')));
         }
 
-        // Affiliation
-        $affiliation = $this->getPrimaryTranslation($author->getAffiliation(null), $objectLocalePrecedence);
-        if (!empty($affiliation)) {
-            $affiliationNode = $doc->createElementNS($deployment->getNamespace(), 'ProfessionalAffiliation');
-            $affiliationNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation, ENT_COMPAT, 'UTF-8')));
-            $contributorNode->appendChild($affiliationNode);
+        // Affiliations and RORs
+        $affiliations = $author->getAffiliations();
+        if (count($affiliations) > 0) {
+            foreach ($author->getAffiliations() as $affiliation) {
+                $affiliationNode = $doc->createElementNS($deployment->getNamespace(), 'ProfessionalAffiliation');
+                $affiliationNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation->getLocalizedName($locale), ENT_COMPAT, 'UTF-8')));
+                if ($affiliation->getRor()) {
+                    $institutionIdentifierNode = $doc->createElementNS($deployment->getNamespace(), 'InstitutionIdentifier', htmlspecialchars($affiliation->getRor(), ENT_COMPAT, 'UTF-8'));
+                    $institutionIdentifierNode->setAttribute('type', 'ror');
+                    $affiliationNode->appendChild($institutionIdentifierNode);
+                }
+                $contributorNode->appendChild($affiliationNode);
+            }
         }
 
         // Biographical note
