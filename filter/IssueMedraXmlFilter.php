@@ -116,7 +116,7 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter
 
         // DOI URL (mandatory)
         $dispatcher = $this->getDispatcher($request);
-        $url = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'issue', 'view', $pubObject->getBestIssueId(), null, null, true);
+        $url = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'issue', 'view', [$pubObject->getBestIssueId()], null, null, true, '');
         if ($plugin->isTestMode($context)) {
             // Change server domain for testing.
             $url = preg_replace('#://[^\s]+/index.php#u', '://example.com/index.php', $url);

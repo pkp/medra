@@ -161,7 +161,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             $urlPath = [$article->getBestId(), $galley->getBestGalleyId()];
         }
         $dispatcher = $this->getDispatcher($request);
-        $url = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'view', $urlPath, null, null, true);
+        $url = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'view', $urlPath, null, null, true, '');
         if ($plugin->isTestMode($context)) {
             // Change server domain for testing.
             $url = preg_replace('#://[^\s]+/index.php#u', '://example.com/index.php', $url);
@@ -550,7 +550,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         foreach ($galleys as $crawledGalley) {
             $urlPath = [$article->getBestId(), $crawledGalley->getBestGalleyId()];
             $dispatcher = $this->getDispatcher($request);
-            $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true);
+            $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true, '');
             $iParadigmsItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
             $iParadigmsItemNode->setAttribute('crawler', 'iParadigms');
             $iParadigmsItemNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL)));
@@ -574,7 +574,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         foreach ($galleys as $galley) {
             $urlPath = [$article->getBestId(), $galley->getBestGalleyId()];
             $dispatcher = $this->getDispatcher($request);
-            $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true);
+            $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true, '');
             $textMiningItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
             $resourceNode = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL));
             if (!$galley->getData('urlRemote')) {
