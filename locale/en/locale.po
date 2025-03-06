@@ -133,7 +133,7 @@ msgid "plugins.importexport.medra.crossref.label"
 msgstr "Deposit to Crossref"
 
 msgid "plugins.importexport.medra.crossref"
-msgstr "Deposit the DOIs also with the Crossref. (This mEDRA service must be enabled for your account.)"
+msgstr "Also deposit the DOIs with Crossref. (This mEDRA service must be enabled for your account.)"
 
 msgid "plugins.importexport.medra.crossref.error.cause"
 msgstr "Cause: file not valid in respect to the mEDRA and/or Crossref requirements."

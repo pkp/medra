@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/medra/MedraExportPlugin.php
  *
- * Copyright (c) 2014-2024 Simon Fraser University
- * Copyright (c) 2003-2024 John Willinsky
+ * Copyright (c) 2014-2025 Simon Fraser University
+ * Copyright (c) 2003-2025 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class MedraExportPlugin
@@ -333,13 +333,13 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
             $errorMsg .=
                 __('plugins.importexport.medra.crossref.error.code') . ': ' . $error['code'] . PHP_EOL .
                 __('plugins.importexport.medra.crossref.error.element') . ': ' . $error['reference'] . PHP_EOL .
-                __('plugins.importexport.medra.crossref.error.description') . ': ' . $error['description'] . PHP_EOL . PHP_EOL ;
+                __('plugins.importexport.medra.crossref.error.description') . ': ' . $error['description'] . PHP_EOL . PHP_EOL;
         }
 
-            $errorMsg .=
-                __("plugins.importexport.common.invalidXML") . ': ' . PHP_EOL .
-                $xml .
-                PHP_EOL;
+        $errorMsg .=
+            __("plugins.importexport.common.invalidXML") . ': ' . PHP_EOL .
+            $xml .
+            PHP_EOL;
         return $errorMsg;
     }
 
