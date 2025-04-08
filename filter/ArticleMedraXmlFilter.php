@@ -28,6 +28,7 @@ use PKP\context\Context;
 use PKP\core\PKPString;
 use PKP\db\DAORegistry;
 use PKP\filter\FilterGroup;
+use PKP\doi\Doi;
 use PKP\galley\Galley;
 use PKP\i18n\LocaleConversion;
 use PKP\plugins\importexport\native\PKPNativeImportExportDeployment;
@@ -96,7 +97,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
      */
     public function createArticleNode(DOMDocument $doc, Submission|Galley $pubObject): DOMElement
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
         $cache = $deployment->getCache();
@@ -107,8 +108,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             $galley = null;
             /** @var Submission $article */
             $article = $pubObject;
-            $doi = $article->getCurrentPublication()->getDoi();
-            $registeredDoi = $article->getCurrentPublication()->getData('medra::registeredDoi');
+            $doiObject = $article->getCurrentPublication()->getData('doiObject');
             if (!$cache->isCached('articles', $article->getId())) {
                 $cache->add($article, null);
             }
@@ -118,8 +118,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         } else {
             /** @var Galley $galley */
             $galley = $pubObject;
-            $doi = $pubObject->getDoi();
-            $registeredDoi = $pubObject->getData('medra::registeredDoi');
+            $doiObject = $pubObject->getData('doiObject');
             $publication = Repo::publication()->get($galley->getData('publicationId'));
             if ($cache->isCached('articles', $publication->getData('submissionId'))) {
                 /** @var Submission $article */
@@ -148,8 +147,8 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $articleNode = $doc->createElementNS($deployment->getNamespace(), $articleNodeName);
 
         // Notification type (mandatory)
-        assert(empty($registeredDoi) || $registeredDoi == $doi);
-        $notificationType = (empty($registeredDoi) ? self::O4DOI_NOTIFICATION_TYPE_NEW : self::O4DOI_NOTIFICATION_TYPE_UPDATE);
+        $doi = $doiObject->getDoi();
+        $notificationType = ($doiObject->getStatus() == Doi::STATUS_REGISTERED ? self::O4DOI_NOTIFICATION_TYPE_NEW : self::O4DOI_NOTIFICATION_TYPE_UPDATE);
         $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'NotificationType', $notificationType));
 
         // DOI (mandatory)
@@ -174,7 +173,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
 
         // All full-texts, PDF full-texts and remote galleys for text-mining and as-crawled URL
         $submissionGalleys = $pdfGalleys = $remoteGalleys = [];
-
+        $hasTextMiningCandidate = false;
         // preferred PDF full-text for the as-crawled URL
         $pdfGalleyInArticleLocale = null;
         $genreDao = DAORegistry::getDAO('GenreDAO'); /** @var GenreDAO $genreDao */
@@ -184,12 +183,16 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             if ($submissionFileId && $galleyForCollectionFile = Repo::submissionFile()->get($submissionFileId)) {
                 $genre = $genreDao->getById($galleyForCollectionFile->getData('genreId'));
                 if (!$genre->getSupplementary()) {
+                    $mimeType = $galleyForCollectionFile->getData('mimetype');
                     $submissionGalleys[] = $galleyForCollection;
-                    if ($galleyForCollectionFile->getData('mimetype') == 'application/pdf') {
+                    if ($mimeType == 'application/pdf') {
                         $pdfGalleys[] = $galleyForCollection;
                         if (!$pdfGalleyInArticleLocale && $galleyForCollection->getLocale() == $article->getCurrentPublication()->getData('locale')) {
                             $pdfGalleyInArticleLocale = $galleyForCollection;
                         }
+                    }
+                    if (!$hasTextMiningCandidate && strpos($mimeType, 'audio') === false && strpos($mimeType, 'video') === false) {
+                        $hasTextMiningCandidate = true;
                     }
                 }
             } elseif ($galley->getData('urlRemote')) {
@@ -212,7 +215,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         }
         // text-mining collection node
         $submissionGalleys = array_merge($submissionGalleys, $remoteGalleys);
-        if (!empty($submissionGalleys)) {
+        if (!empty($submissionGalleys) && $hasTextMiningCandidate) {
             $this->appendTextMiningCollectionNodes($doc, $articleNode, $article, $submissionGalleys);
         }
 
@@ -264,7 +267,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
      */
     public function createContentItemNode(DOMDocument $doc, Issue $issue, Submission $article, ?Galley $galley, string $pubObjectDoi, array $objectLocalePrecedence): DOMElement
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
         $plugin = $deployment->getPlugin();
@@ -298,7 +301,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             $submissionFileId = $galley->getData('submissionFileId');
             if ($submissionFileId && $galleyFile = Repo::submissionFile()->get($submissionFileId)) {
                 $path = $galleyFile->getData('path');
-                $size = Services::get('file')->fs->fileSize($path);
+                $size = app()->get('file')->fs->fileSize($path);
                 $contentItemNode->appendChild($this->createExtentNode($doc, $size));
             }
         }
