@@ -32,7 +32,7 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter
 {
     /**
      * Constructor
-     * @param $filterGroup FilterGroup
+     * @param FilterGroup $filterGroup
      */
     public function __construct($filterGroup)
     {
@@ -53,7 +53,7 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter
      */
     public function getRootNodeName(): string
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
         $plugin = $deployment->getPlugin();
@@ -94,7 +94,7 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter
      */
     public function createIssueNode(DOMDocument $doc, Issue $pubObject): DOMElement
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
         $cache = $deployment->getCache();
@@ -206,7 +206,7 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter
      */
     public function createJournalIssueNode(DOMDocument $doc, Issue $issue, array $journalLocalePrecedence): DOMElement
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
         $plugin = $deployment->getPlugin();
