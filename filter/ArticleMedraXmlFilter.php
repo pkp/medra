@@ -574,17 +574,23 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
 
         $textMiningCollectionNode = $doc->createElementNS($deployment->getNamespace(), 'Collection');
         $textMiningCollectionNode->setAttribute('property', 'text-mining');
-        foreach ($galleys as $galley) {
-            $urlPath = [$article->getBestId(), $galley->getBestGalleyId()];
-            $dispatcher = $this->getDispatcher($request);
-            $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true, '');
-            $textMiningItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
-            $resourceNode = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL));
-            if (!$galley->getData('urlRemote')) {
-                $resourceNode->setAttribute('mime_type', $galley->getFileType());
+        foreach ($galleys as $galley) { /** @var Galley $galley */
+            $submissionFileId = $galley->getData('submissionFileId');
+            if ($submissionFileId && $galleyFile = Repo::submissionFile()->get($submissionFileId)) {
+                $mimeType = $galleyFile->getData('mimetype');
+                if (strpos($mimeType, 'audio') === false && strpos($mimeType, 'video') === false) {
+                    $urlPath = [$article->getBestId(), $galley->getBestGalleyId()];
+                    $dispatcher = $this->getDispatcher($request);
+                    $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true, '');
+                    $textMiningItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
+                    $resourceNode = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL));
+                    if (!$galley->getData('urlRemote')) {
+                        $resourceNode->setAttribute('mime_type', $mimeType);
+                    }
+                    $textMiningItemNode->appendChild($resourceNode);
+                    $textMiningCollectionNode->appendChild($textMiningItemNode);
+                }
             }
-            $textMiningItemNode->appendChild($resourceNode);
-            $textMiningCollectionNode->appendChild($textMiningItemNode);
         }
         $articleNode->appendChild($textMiningCollectionNode);
     }
