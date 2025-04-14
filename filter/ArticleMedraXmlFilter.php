@@ -23,7 +23,6 @@ use APP\plugins\DOIPubIdExportPlugin;
 use APP\submission\Submission;
 use DOMDocument;
 use DOMElement;
-use PKP\citation\CitationDAO;
 use PKP\context\Context;
 use PKP\core\PKPString;
 use PKP\db\DAORegistry;
@@ -436,8 +435,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             }
         }
         // Add citation list (unstructured)
-        $citationDao = DAORegistry::getDAO('CitationDAO'); /** @var CitationDAO $citationDao */
-        $parsedCitations = $citationDao->getByPublicationId($article->getCurrentPublication()->getId())->toArray();
+        $parsedCitations = $article->getCurrentPublication()->getData('citations');
         if (!empty($parsedCitations)) {
             $this->appendCitationListNodes($doc, $contentItemNode, $pubObjectDoi, $parsedCitations);
         }
