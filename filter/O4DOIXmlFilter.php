@@ -173,7 +173,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
      *
      * @param ?string $epubFormat O4DOI_EPUB_FORMAT_*
      */
-    public function createSerialPublicationNode(DOMDocument $doc, array $journalLocalePrecedence, string $epubFormat = null): DOMElement
+    public function createSerialPublicationNode(DOMDocument $doc, array $journalLocalePrecedence, ?string $epubFormat = null): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -220,7 +220,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
      *
      * @param string $titleType O4DOI_TITLE_TYPE_*
      */
-    public function createTitleNode(DOMDocument $doc, string $locale, string $localizedTitle, string $titleType, string $localizedSubtitle = null): DOMElement
+    public function createTitleNode(DOMDocument $doc, string $locale, string $localizedTitle, string $titleType, ?string $localizedSubtitle = null): DOMElement
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
