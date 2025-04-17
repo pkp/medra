@@ -13,7 +13,7 @@
 <version>
   <application>medra</application>
   <type>plugins.generic</type>
-  <release>4.0.0.3</release>
-  <date>2024-03-19</date>
+  <release>5.0.0.0</release>
+  <date>2025-04-17</date>
   <class>MedraPlugin</class>
 </version>
