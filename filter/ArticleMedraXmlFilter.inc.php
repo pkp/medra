@@ -203,15 +203,16 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$journalId = $issue->getData('journalId');
 		if(!empty($journalId)){
 		    $accessRights = null;
-		    $journalDao = DAORegistry::getDAO('JournalDAO'); /** @var JournalDAO $journalDao */
-		    $journal = $journalDao->getById($journalId);
-		    if($journal->getData('publishingMode') == PUBLISHING_MODE_OPEN){
+		    //$journalDao = DAORegistry::getDAO('JournalDAO'); /** @var JournalDAO $journalDao */
+		    //$journal = $journalDao->getById($journalId);
+		    $journal = $context;
+		    if($journal->getData('publishingMode') == O4DOI_PUBLISHING_MODE_OPEN){
 		        $accessRights = 'openAccess';
-		    } else if($journal->getData('publishingMode') == PUBLISHING_MODE_SUBSCRIPTION) {
-		        if ($issue->getAccessStatus() == ISSUE_MODE_OPEN) {
+		    } else if($journal->getData('publishingMode') == O4DOI_PUBLISHING_MODE_SUBSCRIPTION) {
+		        if ($issue->getAccessStatus() == O4DOI_ISSUE_MODE_OPEN) {
 		            $accessRights = 'openAccess';
-		        } else if ($issue->getAccessStatus() == ISSUE_MODE_SUBSCRIPTION) {
-		            if ($article->getCurrentPublication()->getData('accessStatus') == ISSUE_ARTICLE_MODE_OPEN) {
+		        } else if ($issue->getAccessStatus() == O4DOI_ISSUE_MODE_SUBSCRIPTION) {
+		            if ($article->getCurrentPublication()->getData('accessStatus') == O4DOI_ISSUE_ARTICLE_MODE_OPEN) {
 		                $accessRights = 'openAccess';
 		            }
 		        }
@@ -222,8 +223,8 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		        if($accessRights == 'openAccess'){
 		            $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FreeToRead'));
 		        }
-		        if($journal->getData('licenseUrl') != ''){
-		            $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'License', $journal->getData('licenseUrl')));
+		        if(!empty($rightsURL)){
+		            $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'License', $rightsURL));
 		        }
 		        $articleNode->appendChild($accessIndicatorsNode);
 		    }
