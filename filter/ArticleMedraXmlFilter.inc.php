@@ -205,18 +205,19 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		    $accessRights = null;
 		    $journalDao = DAORegistry::getDAO('JournalDAO'); /** @var JournalDAO $journalDao */
 		    $journal = $journalDao->getById($journalId);
-		    if($journal->getData('publishingMode') == 0){
+		    if($journal->getData('publishingMode') == PUBLISHING_MODE_OPEN){
 		        $accessRights = 'openAccess';
-		    } else if($journal->getData('publishingMode') == 1) {
-		        if ($issue->getAccessStatus() == 1) {
+		    } else if($journal->getData('publishingMode') == PUBLISHING_MODE_SUBSCRIPTION) {
+		        if ($issue->getAccessStatus() == ISSUE_MODE_OPEN) {
 		            $accessRights = 'openAccess';
-		        } else if ($issue->getAccessStatus() == 2) {
-		            if ($article->getCurrentPublication()->getData('accessStatus') == 1) {
+		        } else if ($issue->getAccessStatus() == ISSUE_MODE_SUBSCRIPTION) {
+		            if ($article->getCurrentPublication()->getData('accessStatus') == ISSUE_ARTICLE_MODE_OPEN) {
 		                $accessRights = 'openAccess';
 		            }
 		        }
 		    }
-		    if($accessRights == 'openAccess' || !empty($journal->getData('licenseUrl'))){
+		    $rightsURL = $article->getCurrentPublication()->getData('licenseUrl') ? $context->getData('licenseUrl') : $journal->getData('licenseUrl');
+		    if($accessRights == 'openAccess' || !empty($rightsURL)){
 		        $accessIndicatorsNode = $doc->createElementNS($deployment->getNamespace(), 'AccessIndicators');
 		        if($accessRights == 'openAccess'){
 		            $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FreeToRead'));
