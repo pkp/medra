@@ -79,6 +79,11 @@ define('O4DOI_RELATION_IS_A_LANGUAGE_VERSION_OF', '85');
 define('O4DOI_RELATION_IS_MANIFESTED_IN', '89');
 define('O4DOI_RELATION_IS_A_MANIFESTATION_OF', '90');
 
+define('O4DOI_PUBLISHING_MODE_OPEN', '0');
+define('O4DOI_PUBLISHING_MODE_SUBSCRIPTION', '1');
+define('O4DOI_ISSUE_MODE_OPEN', '1');
+define('O4DOI_ISSUE_MODE_SUBSCRIPTION', '2');
+define('O4DOI_ISSUE_ARTICLE_MODE_OPEN', '1');
 
 import('lib.pkp.plugins.importexport.native.filter.NativeExportFilter');
 
