@@ -206,13 +206,13 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		    //$journalDao = DAORegistry::getDAO('JournalDAO'); /** @var JournalDAO $journalDao */
 		    //$journal = $journalDao->getById($journalId);
 		    $journal = $context;
-		    if($journal->getData('publishingMode') == O4DOI_PUBLISHING_MODE_OPEN){
+		    if($journal->getData('publishingMode') == \APP\journal\Journal::PUBLISHING_MODE_OPEN){
 		        $accessRights = 'openAccess';
-		    } else if($journal->getData('publishingMode') == O4DOI_PUBLISHING_MODE_SUBSCRIPTION) {
-		        if ($issue->getAccessStatus() == O4DOI_ISSUE_MODE_OPEN) {
+		    } else if($journal->getData('publishingMode') == \APP\journal\Journal::PUBLISHING_MODE_SUBSCRIPTION) {
+		        if ($issue->getAccessStatus() == \APP\issue\Issue::ISSUE_ACCESS_OPEN) {
 		            $accessRights = 'openAccess';
-		        } else if ($issue->getAccessStatus() == O4DOI_ISSUE_MODE_SUBSCRIPTION) {
-		            if ($article->getCurrentPublication()->getData('accessStatus') == O4DOI_ISSUE_ARTICLE_MODE_OPEN) {
+		        } else if ($issue->getAccessStatus() == \APP\issue\Issue::ISSUE_ACCESS_SUBSCRIPTION) {
+		            if ($article->getCurrentPublication()->getData('accessStatus') == \APP\submission\Submission::ARTICLE_ACCESS_OPEN) {
 		                $accessRights = 'openAccess';
 		            }
 		        }
