@@ -315,7 +315,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$keywords = $this->getPrimaryTranslation($allKeywords, $objectLocalePrecedence);
 		if (!empty($keywords)) {
 			$keywordsString = implode(';', $keywords);
-			$contentItemNode->appendChild($this->createSubjectNode($doc, O4DOI_SUBJECT_SCHEME_PUBLISHER, $keywordsString));
+			$contentItemNode->appendChild($this->createSubjectNode($doc, O4DOI_SUBJECT_SCHEME_KEYWORDS, $keywordsString));
 		}
 		// Object Description 'OtherText'
 		$descriptions = $this->getTranslationsByPrecedence($article->getCurrentPublication()->getData('abstract'), $objectLocalePrecedence);
