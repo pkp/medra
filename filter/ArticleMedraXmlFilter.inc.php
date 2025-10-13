@@ -198,7 +198,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		    $issue = Repo::issue()->get($issueId, $context->getId());
 		    if ($issue) $cache->add($issue, null);
 		}
-		$journalId = $issue->getData('journalId');
+		// access Rights, license URL
 		$accessRights = null;
 		if($context->getData('publishingMode') == PUBLISHING_MODE_OPEN){
 			$accessRights = 'openAccess';
