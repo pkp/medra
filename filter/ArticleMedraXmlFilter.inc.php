@@ -195,7 +195,8 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		if ($cache->isCached('issues', $issueId)) {
 		    $issue = $cache->get('issues', $issueId);
 		} else {
-		    $issue = Repo::issue()->get($issueId, $context->getId());
+		    $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+			$issue = $issueDao->getById($issueId, $context->getId());
 		    if ($issue) $cache->add($issue, null);
 		}
 		// access Rights, license URL
@@ -236,7 +237,6 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$articleNode->appendChild($this->createSerialPublicationNode($doc, $journalLocalePrecedence, $epubFormat));
 		// Journal Issue (mandatory)
 		$articleNode->appendChild($this->createJournalIssueNode($doc, $issue, $journalLocalePrecedence));
-
 		// Object locale precedence.
 		$objectLocalePrecedence = $this->getObjectLocalePrecedence($context, $article, $galley);
 		// Content Item (mandatory for articles)
@@ -314,8 +314,9 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$allKeywords = $submissionKeywordDao->getKeywords($article->getCurrentPublication()->getId(), $context->getSupportedSubmissionLocales());
 		$keywords = $this->getPrimaryTranslation($allKeywords, $objectLocalePrecedence);
 		if (!empty($keywords)) {
-			$keywordsString = implode(';', $keywords);
-			$contentItemNode->appendChild($this->createSubjectNode($doc, O4DOI_SUBJECT_SCHEME_KEYWORDS, $keywordsString));
+			foreach ($keywords as $keyword) {
+				$contentItemNode->appendChild($this->createSubjectNode($doc, O4DOI_SUBJECT_SCHEME_KEYWORDS, $keyword));
+			}
 		}
 		// Object Description 'OtherText'
 		$descriptions = $this->getTranslationsByPrecedence($article->getCurrentPublication()->getData('abstract'), $objectLocalePrecedence);
