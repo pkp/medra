@@ -63,6 +63,7 @@ define('O4DOI_CONTRIBUTOR_ROLE_ACTUAL_AUTHOR', 'A01');
 define('O4DOI_LANGUAGE_ROLE_LANGUAGE_OF_TEXT', '01');
 
 // Subject schemes
+define('O4DOI_SUBJECT_SCHEME_KEYWORDS', '20');
 define('O4DOI_SUBJECT_SCHEME_PUBLISHER', '23');
 define('O4DOI_SUBJECT_SCHEME_PROPRIETARY', '24');
 
@@ -78,7 +79,6 @@ define('O4DOI_RELATION_IS_A_DIFFERENT_FORM_OF', '84');
 define('O4DOI_RELATION_IS_A_LANGUAGE_VERSION_OF', '85');
 define('O4DOI_RELATION_IS_MANIFESTED_IN', '89');
 define('O4DOI_RELATION_IS_A_MANIFESTATION_OF', '90');
-
 
 import('lib.pkp.plugins.importexport.native.filter.NativeExportFilter');
 

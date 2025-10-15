@@ -191,7 +191,36 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		if (!empty($submissionGalleys)) {
 			$this->appendTextMiningCollectionNodes($doc, $articleNode, $article, $submissionGalleys);
 		}
-
+		$issueId = $article->getCurrentPublication()->getData('issueId');
+		if ($cache->isCached('issues', $issueId)) {
+		    $issue = $cache->get('issues', $issueId);
+		} else {
+		    $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+			$issue = $issueDao->getById($issueId, $context->getId());
+		    if ($issue) $cache->add($issue, null);
+		}
+		// access Rights, license URL
+		$accessRights = null;
+		if ($context->getData('publishingMode') == PUBLISHING_MODE_OPEN){
+			$accessRights = 'openAccess';
+		} else if ($context->getData('publishingMode') == PUBLISHING_MODE_SUBSCRIPTION) {
+			if ($issue->getAccessStatus() == ISSUE_ACCESS_OPEN) {
+				$accessRights = 'openAccess';
+			} else if ($article->getCurrentPublication()->getData('accessStatus') == ARTICLE_ACCESS_OPEN) {
+				$accessRights = 'openAccess';
+			}
+		}
+		$rightsURL = $article->getCurrentPublication()->getData('licenseUrl') ?? $context->getData('licenseUrl');
+		if ($accessRights == 'openAccess' || !empty($rightsURL)){
+			$accessIndicatorsNode = $doc->createElementNS($deployment->getNamespace(), 'AccessIndicators');
+			if ($accessRights == 'openAccess'){
+				$accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FreeToRead'));
+			}
+			if (!empty($rightsURL)){
+				$accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'License', $rightsURL));
+			}
+			$articleNode->appendChild($accessIndicatorsNode);
+		}
 		// DOI strucural type
 		$articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIStructuralType', $this->getDOIStructuralType()));
 		// Registrant (mandatory)
@@ -207,16 +236,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		// Serial Publication (mandatory)
 		$articleNode->appendChild($this->createSerialPublicationNode($doc, $journalLocalePrecedence, $epubFormat));
 		// Journal Issue (mandatory)
-		$issueId = $article->getCurrentPublication()->getData('issueId');
-		if ($cache->isCached('issues', $issueId)) {
-			$issue = $cache->get('issues', $issueId);
-		} else {
-			$issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-			$issue = $issueDao->getById($issueId, $context->getId());
-			if ($issue) $cache->add($issue, null);
-		}
 		$articleNode->appendChild($this->createJournalIssueNode($doc, $issue, $journalLocalePrecedence));
-
 		// Object locale precedence.
 		$objectLocalePrecedence = $this->getObjectLocalePrecedence($context, $article, $galley);
 		// Content Item (mandatory for articles)
@@ -294,8 +314,9 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$allKeywords = $submissionKeywordDao->getKeywords($article->getCurrentPublication()->getId(), $context->getSupportedSubmissionLocales());
 		$keywords = $this->getPrimaryTranslation($allKeywords, $objectLocalePrecedence);
 		if (!empty($keywords)) {
-			$keywordsString = implode(';', $keywords);
-			$contentItemNode->appendChild($this->createSubjectNode($doc, O4DOI_SUBJECT_SCHEME_PUBLISHER, $keywordsString));
+			foreach ($keywords as $keyword) {
+				$contentItemNode->appendChild($this->createSubjectNode($doc, O4DOI_SUBJECT_SCHEME_KEYWORDS, $keyword));
+			}
 		}
 		// Object Description 'OtherText'
 		$descriptions = $this->getTranslationsByPrecedence($article->getCurrentPublication()->getData('abstract'), $objectLocalePrecedence);
@@ -430,12 +451,21 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			$contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($personName, ENT_COMPAT, 'UTF-8')));
 		}
 		// Affiliation
-		$affiliation = $this->getPrimaryTranslation($author->getAffiliation(null), $objectLocalePrecedence);
-		if (!empty($affiliation)) {
-			$affiliationNode = $doc->createElementNS($deployment->getNamespace(), 'ProfessionalAffiliation');
-			$affiliationNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation, ENT_COMPAT, 'UTF-8')));
-			$contributorNode->appendChild($affiliationNode);
-		}
+        $affiliation = $this->getPrimaryTranslation($author->getAffiliation(null), $objectLocalePrecedence);
+        // Institution ROR
+        $institution = $author->getData('rorId');
+        if (!empty($affiliation) || !empty($institution)) {
+            $affiliationNode = $doc->createElementNS($deployment->getNamespace(), 'ProfessionalAffiliation');
+            if (!empty($affiliation)){
+                $affiliationNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation, ENT_COMPAT, 'UTF-8')));
+            }   
+            if (!empty($institution)) {
+                $institutionNode = $doc->createElementNS($deployment->getNamespace(), 'InstitutionIdentifier', htmlspecialchars($institution, ENT_COMPAT, 'UTF-8'));
+                $institutionNode->setAttribute('type', 'ror');
+                $affiliationNode->appendChild($institutionNode);
+            }
+            $contributorNode->appendChild($affiliationNode);
+        }
 		// Biographical note
 		$bioNote = $this->getPrimaryTranslation($author->getBiography(null), $objectLocalePrecedence);
 		if (!empty($bioNote)) {
