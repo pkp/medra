@@ -201,7 +201,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		}
 		// access Rights, license URL
 		$accessRights = null;
-		if($context->getData('publishingMode') == PUBLISHING_MODE_OPEN){
+		if ($context->getData('publishingMode') == PUBLISHING_MODE_OPEN){
 			$accessRights = 'openAccess';
 		} else if ($context->getData('publishingMode') == PUBLISHING_MODE_SUBSCRIPTION) {
 			if ($issue->getAccessStatus() == ISSUE_ACCESS_OPEN) {
@@ -211,12 +211,12 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 			}
 		}
 		$rightsURL = $article->getCurrentPublication()->getData('licenseUrl') ?? $context->getData('licenseUrl');
-		if($accessRights == 'openAccess' || !empty($rightsURL)){
+		if ($accessRights == 'openAccess' || !empty($rightsURL)){
 			$accessIndicatorsNode = $doc->createElementNS($deployment->getNamespace(), 'AccessIndicators');
-			if($accessRights == 'openAccess'){
+			if ($accessRights == 'openAccess'){
 				$accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FreeToRead'));
 			}
-			if(!empty($rightsURL)){
+			if (!empty($rightsURL)){
 				$accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'License', $rightsURL));
 			}
 			$articleNode->appendChild($accessIndicatorsNode);
