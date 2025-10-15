@@ -203,12 +203,12 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$accessRights = null;
 		if($context->getData('publishingMode') == PUBLISHING_MODE_OPEN){
 			$accessRights = 'openAccess';
-		} else if($context->getData('publishingMode') == PUBLISHING_MODE_SUBSCRIPTION) {
+		} else if ($context->getData('publishingMode') == PUBLISHING_MODE_SUBSCRIPTION) {
 			if ($issue->getAccessStatus() == ISSUE_ACCESS_OPEN) {
 				$accessRights = 'openAccess';
 			} else if ($article->getCurrentPublication()->getData('accessStatus') == ARTICLE_ACCESS_OPEN) {
-						$accessRights = 'openAccess';
-					}
+				$accessRights = 'openAccess';
+			}
 		}
 		$rightsURL = $article->getCurrentPublication()->getData('licenseUrl') ?? $context->getData('licenseUrl');
 		if($accessRights == 'openAccess' || !empty($rightsURL)){
