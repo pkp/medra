@@ -87,6 +87,7 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
     public const O4DOI_LANGUAGE_ROLE_LANGUAGE_OF_TEXT = '01';
 
     // Subject schemes
+    public const O4DOI_SUBJECT_SCHEME_KEYWORDS = '20';
     public const O4DOI_SUBJECT_SCHEME_PUBLISHER = '23';
     public const O4DOI_SUBJECT_SCHEME_PROPRIETARY = '24';
 
