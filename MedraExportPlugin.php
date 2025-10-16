@@ -15,6 +15,7 @@
 namespace APP\plugins\generic\medra;
 
 use APP\core\Application;
+use APP\core\Request;
 use APP\facades\Repo;
 use APP\issue\Issue;
 use APP\plugins\DOIPubIdExportPlugin;
@@ -97,7 +98,7 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc DOIPubIdExportPlugin::getSettingsFormClassName()
      */
-    public function getSettingsFormClassName()
+    public function getSettingsFormClassName(): string
     {
         throw new Exception('DOI settings no longer managed via plugin settings form.');
     }
@@ -113,14 +114,11 @@ class MedraExportPlugin extends DOIPubIdExportPlugin
     /**
      * @copydoc PubObjectsExportPlugin::getStatusMessage()
      */
-    public function getStatusMessage($request)
+    public function getStatusMessage(Request $request): ?string
     {
         $articleId = $request->getUserVar('articleId');
         $article = Repo::submission()->get((int)$articleId);
-        $failedMsg = $article->getData('doiObject')->getData($this->agencyPlugin->getFailedMsgSettingName());
-        if (!empty($failedMsg)) {
-            return $failedMsg;
-        }
+        return $article->getData('doiObject')->getData($this->agencyPlugin->getFailedMsgSettingName());
     }
 
     /**
