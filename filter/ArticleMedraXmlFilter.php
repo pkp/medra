@@ -460,9 +460,18 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         }
         // Affiliation
         $affiliation = $this->getPrimaryTranslation($author->getAffiliation(null), $objectLocalePrecedence);
-        if (!empty($affiliation)) {
+        // Institution ROR
+        $institution = $author->getData('rorId');
+        if (!empty($affiliation) || !empty($institution)) {
             $affiliationNode = $doc->createElementNS($deployment->getNamespace(), 'ProfessionalAffiliation');
-            $affiliationNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation, ENT_COMPAT, 'UTF-8')));
+            if (!empty($affiliation)){
+                $affiliationNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation, ENT_COMPAT, 'UTF-8')));
+            }   
+            if (!empty($institution)) {
+                $institutionNode = $doc->createElementNS($deployment->getNamespace(), 'InstitutionIdentifier', htmlspecialchars($institution, ENT_COMPAT, 'UTF-8'));
+                $institutionNode->setAttribute('type', 'ror');
+                $affiliationNode->appendChild($institutionNode);
+            }
             $contributorNode->appendChild($affiliationNode);
         }
         // Biographical note
