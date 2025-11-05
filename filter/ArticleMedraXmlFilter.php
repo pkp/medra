@@ -465,7 +465,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $institution = $author->getData('rorId');
         if (!empty($affiliation) || !empty($institution)) {
             $affiliationNode = $doc->createElementNS($deployment->getNamespace(), 'ProfessionalAffiliation');
-            if (!empty($affiliation)){
+            if (!empty($affiliation)) {
                 $affiliationNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation, ENT_COMPAT, 'UTF-8')));
             }   
             if (!empty($institution)) {
