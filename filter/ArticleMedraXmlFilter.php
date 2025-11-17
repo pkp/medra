@@ -21,6 +21,7 @@ use APP\facades\Repo;
 use APP\issue\Issue;
 use APP\plugins\DOIPubIdExportPlugin;
 use APP\submission\Submission;
+use APP\journal\Journal;
 use DOMDocument;
 use DOMElement;
 use PKP\context\Context;
@@ -229,27 +230,26 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             }
         }
         $accessRights = null;
-        if($context->getData('publishingMode') == PUBLISHING_MODE_OPEN){
+        if ($context->getData('publishingMode') == Journal::PUBLISHING_MODE_OPEN) {
+            $accessRights = 'openAccess';
+        } else if ($context->getData('publishingMode') == Journal::PUBLISHING_MODE_SUBSCRIPTION) {
+            if ($issue->getAccessStatus() == Issue::ISSUE_ACCESS_OPEN) {
                 $accessRights = 'openAccess';
-        } else if($context->getData('publishingMode') == PUBLISHING_MODE_SUBSCRIPTION) {
-                if ($issue->getAccessStatus() == ISSUE_ACCESS_OPEN) {
-                        $accessRights = 'openAccess';
-                } else if ($article->getCurrentPublication()->getData('accessStatus') == ARTICLE_ACCESS_OPEN) {
-                                $accessRights = 'openAccess';
-                        }
+            } else if ($article->getCurrentPublication()->getData('accessStatus') == Submission::ARTICLE_ACCESS_OPEN) {
+                $accessRights = 'openAccess';
+            }
         }
         $rightsURL = $article->getCurrentPublication()->getData('licenseUrl') ?? $context->getData('licenseUrl');
-        if($accessRights == 'openAccess' || !empty($rightsURL)){
-                $accessIndicatorsNode = $doc->createElementNS($deployment->getNamespace(), 'AccessIndicators');
-                if($accessRights == 'openAccess'){
-                        $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FreeToRead'));
-                }
-                if(!empty($rightsURL)){
-                        $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'License', $rightsURL));
-                }
-                $articleNode->appendChild($accessIndicatorsNode);
+        if ($accessRights == 'openAccess' || !empty($rightsURL)) {
+            $accessIndicatorsNode = $doc->createElementNS($deployment->getNamespace(), 'AccessIndicators');
+            if ($accessRights == 'openAccess') {
+                $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FreeToRead'));
+            }
+            if (!empty($rightsURL)) {
+                $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'License', $rightsURL));
+            }
+            $articleNode->appendChild($accessIndicatorsNode);
         }
-
         // DOI structural type
         $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIStructuralType', $this->getDOIStructuralType()));
 
@@ -516,7 +516,9 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         if (count($affiliations) > 0) {
             foreach ($author->getAffiliations() as $affiliation) {
                 $affiliationNode = $doc->createElementNS($deployment->getNamespace(), 'ProfessionalAffiliation');
-                $affiliationNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation->getLocalizedName($locale), ENT_COMPAT, 'UTF-8')));
+                if (!empty($affiliation->getLocalizedName($locale))) {
+                    $affiliationNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation->getLocalizedName($locale), ENT_COMPAT, 'UTF-8')));
+                }
                 if ($affiliation->getRor()) {
                     $institutionIdentifierNode = $doc->createElementNS($deployment->getNamespace(), 'InstitutionIdentifier', htmlspecialchars($affiliation->getRor(), ENT_COMPAT, 'UTF-8'));
                     $institutionIdentifierNode->setAttribute('type', 'ror');
