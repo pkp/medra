@@ -71,6 +71,9 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
                 return true;
             }
 
+            PluginRegistry::register('importexport', new MedraExportPlugin($this), $this->getPluginPath());
+            $this->exportPlugin = PluginRegistry::getPlugin('importexport', 'MedraExportPlugin');
+
             if ($this->getEnabled($mainContextId)) {
                 $this->pluginInitialization();
             }
@@ -351,9 +354,6 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
      */
     private function pluginInitialization()
     {
-        PluginRegistry::register('importexport', new MedraExportPlugin($this), $this->getPluginPath());
-        $this->exportPlugin = PluginRegistry::getPlugin('importexport', 'MedraExportPlugin');
-
         Hook::add('DoiSettingsForm::setEnabledRegistrationAgencies', [$this, 'addAsRegistrationAgencyOption']);
         Hook::add('DoiSetupSettingsForm::getObjectTypes', [$this, 'addAllowedObjectTypes']);
         Hook::add('DoiListPanel::setConfig', [$this, 'addRegistrationAgencyName']);
