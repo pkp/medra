@@ -23,6 +23,7 @@ use APP\plugins\DOIPubIdExportPlugin;
 use APP\submission\Submission;
 use DOMDocument;
 use DOMElement;
+use Illuminate\Support\LazyCollection;
 use PKP\context\Context;
 use PKP\core\PKPString;
 use PKP\db\DAORegistry;
@@ -596,7 +597,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
     /**
      * Append the CitationList node with unstructured citations to the ContentItem data node.
      */
-    public function appendCitationListNodes(DOMDocument $doc, DOMElement $contentItemNode, string $pubObjectDoi, array $parsedCitations): void
+    public function appendCitationListNodes(DOMDocument $doc, DOMElement $contentItemNode, string $pubObjectDoi, LazyCollection $parsedCitations): void
     {
         /** @var PKPNativeImportExportDeployment $deployment */
         $deployment = $this->getDeployment();
