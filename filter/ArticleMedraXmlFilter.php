@@ -21,6 +21,7 @@ use APP\facades\Repo;
 use APP\issue\Issue;
 use APP\plugins\DOIPubIdExportPlugin;
 use APP\submission\Submission;
+use APP\journal\Journal;
 use DOMDocument;
 use DOMElement;
 use Illuminate\Support\LazyCollection;
@@ -219,6 +220,37 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             $this->appendTextMiningCollectionNodes($doc, $articleNode, $article, $submissionGalleys);
         }
 
+        $issueId = $article->getCurrentPublication()->getData('issueId');
+        if ($cache->isCached('issues', $issueId)) {
+            /** @var Issue $issue */
+            $issue = $cache->get('issues', $issueId);
+        } else {
+            $issue = Repo::issue()->get($issueId, $context->getId());
+            if ($issue) {
+                $cache->add($issue, null);
+            }
+        }
+        $accessRights = null;
+        if ($context->getData('publishingMode') == Journal::PUBLISHING_MODE_OPEN) {
+            $accessRights = 'openAccess';
+        } else if ($context->getData('publishingMode') == Journal::PUBLISHING_MODE_SUBSCRIPTION) {
+            if ($issue->getAccessStatus() == Issue::ISSUE_ACCESS_OPEN) {
+                $accessRights = 'openAccess';
+            } else if ($article->getCurrentPublication()->getData('accessStatus') == Submission::ARTICLE_ACCESS_OPEN) {
+                $accessRights = 'openAccess';
+            }
+        }
+        $rightsURL = $article->getCurrentPublication()->getData('licenseUrl') ?? $context->getData('licenseUrl');
+        if ($accessRights == 'openAccess' || !empty($rightsURL)) {
+            $accessIndicatorsNode = $doc->createElementNS($deployment->getNamespace(), 'AccessIndicators');
+            if ($accessRights == 'openAccess') {
+                $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FreeToRead'));
+            }
+            if (!empty($rightsURL)) {
+                $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'License', $rightsURL));
+            }
+            $articleNode->appendChild($accessIndicatorsNode);
+        }
         // DOI structural type
         $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIStructuralType', $this->getDOIStructuralType()));
 
@@ -242,16 +274,6 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $articleNode->appendChild($this->createSerialPublicationNode($doc, $journalLocalePrecedence, $epubFormat));
 
         // Journal Issue (mandatory)
-        $issueId = $article->getCurrentPublication()->getData('issueId');
-        if ($cache->isCached('issues', $issueId)) {
-            /** @var Issue $issue */
-            $issue = $cache->get('issues', $issueId);
-        } else {
-            $issue = Repo::issue()->get($issueId, $context->getId());
-            if ($issue) {
-                $cache->add($issue, null);
-            }
-        }
         $articleNode->appendChild($this->createJournalIssueNode($doc, $issue, $journalLocalePrecedence));
 
         // Object locale precedence.
@@ -333,8 +355,9 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $allKeywords = $article->getCurrentPublication()->getData('keywords');
         $keywords = $this->getPrimaryTranslation($allKeywords, $objectLocalePrecedence);
         if (!empty($keywords)) {
-            $keywordsString = implode(';', $keywords);
-            $contentItemNode->appendChild($this->createSubjectNode($doc, self::O4DOI_SUBJECT_SCHEME_KEYWORDS, $keywordsString));
+            foreach ($keywords as $keyword) {
+                $contentItemNode->appendChild($this->createSubjectNode($doc, self::O4DOI_SUBJECT_SCHEME_KEYWORDS, $keyword));
+            }
         }
 
         // Object Description 'OtherText'
@@ -494,7 +517,9 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         if (count($affiliations) > 0) {
             foreach ($author->getAffiliations() as $affiliation) {
                 $affiliationNode = $doc->createElementNS($deployment->getNamespace(), 'ProfessionalAffiliation');
-                $affiliationNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation->getLocalizedName($locale), ENT_COMPAT, 'UTF-8')));
+                if (!empty($affiliation->getLocalizedName($locale))) {
+                    $affiliationNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation->getLocalizedName($locale), ENT_COMPAT, 'UTF-8')));
+                }
                 if ($affiliation->getRor()) {
                     $institutionIdentifierNode = $doc->createElementNS($deployment->getNamespace(), 'InstitutionIdentifier', htmlspecialchars($affiliation->getRor(), ENT_COMPAT, 'UTF-8'));
                     $institutionIdentifierNode->setAttribute('type', 'ror');
