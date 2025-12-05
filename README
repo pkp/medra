@@ -32,6 +32,8 @@ To use the additional possibility to deposit the DOIs also with the Crossref, th
 
 Version History
 ---------------
+5.0.0.1 - AccessIndicators information (OpenAccess and License), fix keywords and affiliation elements
+5.0.0.0 - update to OJS 3.5
 4.0.0.3 - Bug fix for OJS 3.4.0.x
 4.0.0.2 - Bug fix for OJS 3.4.0.x
 4.0.0.1 - Bug fix for OJS 3.4.0.x
