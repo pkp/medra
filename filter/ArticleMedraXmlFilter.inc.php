@@ -3,8 +3,8 @@
 /**
  * @file plugins/importexport/medra/filter/ArticleMedraXmlFilter.inc.php
  *
- * Copyright (c) 2014-2024 Simon Fraser University
- * Copyright (c) 2000-2024 John Willinsky
+ * Copyright (c) 2014-2025 Simon Fraser University
+ * Copyright (c) 2000-2025 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ArticleMedraXmlFilter
@@ -458,7 +458,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
             $affiliationNode = $doc->createElementNS($deployment->getNamespace(), 'ProfessionalAffiliation');
             if (!empty($affiliation)){
                 $affiliationNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Affiliation', htmlspecialchars($affiliation, ENT_COMPAT, 'UTF-8')));
-            }   
+            }
             if (!empty($institution)) {
                 $institutionNode = $doc->createElementNS($deployment->getNamespace(), 'InstitutionIdentifier', htmlspecialchars($institution, ENT_COMPAT, 'UTF-8'));
                 $institutionNode->setAttribute('type', 'ror');
