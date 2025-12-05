@@ -33,6 +33,7 @@ If the automatic deposit option (in plugin settings) is selected, the mEDRA serv
 
 Version History
 ---------------
+3.0.0.6 - AccessIndicators information (OpenAccess and License), fix keywords and affiliation elements
 3.0.0.5 - fix key attribute of ArticleCitation element for galley DOIs
 3.0.0.4 - consider no contributors, use subtitle element, consider different schema location for test and production
 3.0.0.3 - iParadigms crawler and text-mining collection element, and unstructured citation list added for OJS 3.3.0-14
