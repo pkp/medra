@@ -19,6 +19,7 @@ use APP\facades\Repo;
 use APP\issue\Issue;
 use APP\issue\IssueGalleyDAO;
 use APP\plugins\DOIPubIdExportPlugin;
+use APP\plugins\generic\medra\MedraExportDeployment;
 use APP\submission\Submission;
 use DOMDocument;
 use DOMElement;
@@ -26,7 +27,6 @@ use PKP\context\Context;
 use PKP\db\DAORegistry;
 use PKP\filter\FilterGroup;
 use PKP\galley\Galley;
-use PKP\plugins\importexport\native\PKPNativeImportExportDeployment;
 
 class IssueMedraXmlFilter extends O4DOIXmlFilter
 {
