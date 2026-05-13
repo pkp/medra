@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/medra/filter/ArticleMedraXmlFilter.php
  *
- * Copyright (c) 2014-2024 Simon Fraser University
- * Copyright (c) 2000-2024 John Willinsky
+ * Copyright (c) 2014-2026 Simon Fraser University
+ * Copyright (c) 2000-2026 John Willinsky
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ArticleMedraXmlFilter
@@ -16,22 +16,21 @@ namespace APP\plugins\generic\medra\filter;
 
 use APP\author\Author;
 use APP\core\Application;
-use APP\core\Services;
 use APP\facades\Repo;
 use APP\issue\Issue;
-use APP\plugins\DOIPubIdExportPlugin;
-use APP\submission\Submission;
 use APP\journal\Journal;
+use APP\plugins\DOIPubIdExportPlugin;
+use APP\plugins\generic\medra\MedraExportDeployment;
+use APP\submission\Submission;
 use DOMDocument;
 use DOMElement;
 use PKP\context\Context;
 use PKP\core\PKPString;
 use PKP\db\DAORegistry;
-use PKP\filter\FilterGroup;
 use PKP\doi\Doi;
+use PKP\filter\FilterGroup;
 use PKP\galley\Galley;
 use PKP\i18n\LocaleConversion;
-use PKP\plugins\importexport\native\PKPNativeImportExportDeployment;
 use PKP\submission\GenreDAO;
 
 class ArticleMedraXmlFilter extends O4DOIXmlFilter
@@ -84,8 +83,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         // Create and appet the header node and all parts inside it
         $rootNode->appendChild($this->createHeadNode($doc));
 
-        // Create and append the article nodes,
-        // containing all article information
+        // Create and append the article nodes containing all article information
         foreach ($pubObjects as $pubObject) {
             $rootNode->appendChild($this->createArticleNode($doc, $pubObject));
         }
@@ -149,10 +147,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         // Notification type (mandatory)
         $doi = $doiObject->getDoi();
         $notificationType = ($doiObject->getStatus() == Doi::STATUS_REGISTERED ? self::O4DOI_NOTIFICATION_TYPE_NEW : self::O4DOI_NOTIFICATION_TYPE_UPDATE);
-        $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'NotificationType', $notificationType));
+        $articleNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'NotificationType', $notificationType));
 
         // DOI (mandatory)
-        $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOI', htmlspecialchars($doi, ENT_COMPAT, 'UTF-8')));
+        $articleNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'DOI', htmlspecialchars($doi, ENT_COMPAT, 'UTF-8')));
 
         // DOI URL (mandatory)
         $urlPath = [$article->getBestId()];
@@ -165,7 +163,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             // Change server domain for testing.
             $url = preg_replace('#://[^\s]+/index.php#u', '://example.com/index.php', $url);
         }
-        $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIWebsiteLink', $url));
+        $articleNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'DOIWebsiteLink', $url));
 
         // Add Collection on the content
         // Collection property="crawler-based"
@@ -191,7 +189,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
                             $pdfGalleyInArticleLocale = $galleyForCollection;
                         }
                     }
-                    if (!$hasTextMiningCandidate && strpos($mimeType, 'audio') === false && strpos($mimeType, 'video') === false) {
+                    if (!$hasTextMiningCandidate && !str_contains($mimeType, 'audio') && !str_contains($mimeType, 'video')) {
                         $hasTextMiningCandidate = true;
                     }
                 }
@@ -232,10 +230,10 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $accessRights = null;
         if ($context->getData('publishingMode') == Journal::PUBLISHING_MODE_OPEN) {
             $accessRights = 'openAccess';
-        } else if ($context->getData('publishingMode') == Journal::PUBLISHING_MODE_SUBSCRIPTION) {
+        } elseif ($context->getData('publishingMode') == Journal::PUBLISHING_MODE_SUBSCRIPTION) {
             if ($issue->getAccessStatus() == Issue::ISSUE_ACCESS_OPEN) {
                 $accessRights = 'openAccess';
-            } else if ($article->getCurrentPublication()->getData('accessStatus') == Submission::ARTICLE_ACCESS_OPEN) {
+            } elseif ($article->getCurrentPublication()->getData('accessStatus') == Submission::ARTICLE_ACCESS_OPEN) {
                 $accessRights = 'openAccess';
             }
         }
@@ -243,21 +241,21 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         if ($accessRights == 'openAccess' || !empty($rightsURL)) {
             $accessIndicatorsNode = $doc->createElementNS($deployment->getNamespace(), 'AccessIndicators');
             if ($accessRights == 'openAccess') {
-                $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'FreeToRead'));
+                $accessIndicatorsNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'FreeToRead'));
             }
             if (!empty($rightsURL)) {
-                $accessIndicatorsNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'License', $rightsURL));
+                $accessIndicatorsNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'License', $rightsURL));
             }
             $articleNode->appendChild($accessIndicatorsNode);
         }
         // DOI structural type
-        $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'DOIStructuralType', $this->getDOIStructuralType()));
+        $articleNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'DOIStructuralType', $this->getDOIStructuralType()));
 
         // Registrant (mandatory)
-        $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'RegistrantName', htmlspecialchars($plugin->getSetting($context->getId(), 'registrantName'), ENT_COMPAT, 'UTF-8')));
+        $articleNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'RegistrantName', htmlspecialchars($plugin->getSetting($context->getId(), 'registrantName'), ENT_COMPAT, 'UTF-8')));
 
         // Registration authority (mandatory)
-        $articleNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'RegistrationAuthority', 'mEDRA'));
+        $articleNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'RegistrationAuthority', 'mEDRA'));
 
         // WorkIdentifier - proprietary ID
         $pubObjectProprietaryId = $context->getId() . '-' . $article->getCurrentPublication()->getData('issueId') . '-' . $article->getId();
@@ -297,7 +295,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         // Sequence number
         $seq = $article->getCurrentPublication()->getData('seq');
         if ($seq) {
-            $contentItemNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SequenceNumber', $seq));
+            $contentItemNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'SequenceNumber', $seq));
         }
 
         // Describe page runs
@@ -345,8 +343,8 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $languageCode = LocaleConversion::get3LetterIsoFromLocale($objectLocalePrecedence[0]);
         assert(!empty($languageCode));
         $languageNode = $doc->createElementNS($deployment->getNamespace(), 'Language');
-        $languageNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'LanguageRole', self::O4DOI_LANGUAGE_ROLE_LANGUAGE_OF_TEXT));
-        $languageNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'LanguageCode', $languageCode));
+        $languageNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'LanguageRole', self::O4DOI_LANGUAGE_ROLE_LANGUAGE_OF_TEXT));
+        $languageNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'LanguageCode', $languageCode));
         $contentItemNode->appendChild($languageNode);
 
         // Article keywords
@@ -354,6 +352,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         $allKeywords = $article->getCurrentPublication()->getData('keywords');
         $keywords = $this->getPrimaryTranslation($allKeywords, $objectLocalePrecedence);
         if (!empty($keywords)) {
+            $keywords = array_map(static fn ($s) => $s['name'], $keywords);
             foreach ($keywords as $keyword) {
                 $contentItemNode->appendChild($this->createSubjectNode($doc, self::O4DOI_SUBJECT_SCHEME_KEYWORDS, $keyword));
             }
@@ -368,7 +367,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         // Article Publication Date
         $datePublished = $article->getCurrentPublication()->getData('datePublished');
         if (!empty($datePublished)) {
-            $contentItemNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'PublicationDate', date('Ymd', strtotime($datePublished))));
+            $contentItemNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'PublicationDate', date('Ymd', strtotime($datePublished))));
         }
 
         // Relations
@@ -471,17 +470,17 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
      */
     public function createContributorNode(DOMDocument $doc, Author $author, array $objectLocalePrecedence): DOMElement
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $contributorNode = $doc->createElementNS($deployment->getNamespace(), 'Contributor');
 
         // Sequence number
         $seq = $author->getSequence() ?? 0;
         $seq++; // Sequences must begin with 1, so bump our internal sequence by 1.
-        $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SequenceNumber', $seq));
+        $contributorNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'SequenceNumber', $seq));
 
         // Contributor role (mandatory)
-        $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'ContributorRole', self::O4DOI_CONTRIBUTOR_ROLE_ACTUAL_AUTHOR));
+        $contributorNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'ContributorRole', self::O4DOI_CONTRIBUTOR_ROLE_ACTUAL_AUTHOR));
 
         // Contributor ORCID
         if ($author->getData('orcid') && $author->hasVerifiedOrcid()) {
@@ -491,24 +490,24 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         // Person name (mandatory)
         $personName = $author->getFullName(false, false, $objectLocalePrecedence[0]);
         assert(!empty($personName));
-        $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'PersonName', htmlspecialchars($personName, ENT_COMPAT, 'UTF-8')));
+        $contributorNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'PersonName', htmlspecialchars($personName, ENT_COMPAT, 'UTF-8')));
 
         // Inverted person name
         $invertedPersonName = $author->getFullName(false, true, $objectLocalePrecedence[0]);
         assert(!empty($invertedPersonName));
-        $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'PersonNameInverted', htmlspecialchars($invertedPersonName, ENT_COMPAT, 'UTF-8')));
+        $contributorNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'PersonNameInverted', htmlspecialchars($invertedPersonName, ENT_COMPAT, 'UTF-8')));
 
         // Names before key
         $locale = $author->getData('submissionLocale');
         $nameBeforeKey = $author->getLocalizedData(Author::IDENTITY_SETTING_GIVENNAME, $locale);
         assert(!empty($nameBeforeKey));
-        $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'NamesBeforeKey', htmlspecialchars($nameBeforeKey, ENT_COMPAT, 'UTF-8')));
+        $contributorNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'NamesBeforeKey', htmlspecialchars($nameBeforeKey, ENT_COMPAT, 'UTF-8')));
 
         // Key names
         if (($familyName = $author->getLocalizedData(Author::IDENTITY_SETTING_FAMILYNAME, $locale)) != '') {
-            $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($familyName, ENT_COMPAT, 'UTF-8')));
+            $contributorNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($familyName, ENT_COMPAT, 'UTF-8')));
         } else {
-            $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($personName, ENT_COMPAT, 'UTF-8')));
+            $contributorNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'KeyNames', htmlspecialchars($personName, ENT_COMPAT, 'UTF-8')));
         }
 
         // Affiliations and RORs
@@ -531,7 +530,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         // Biographical note
         $bioNote = $this->getPrimaryTranslation($author->getBiography(null), $objectLocalePrecedence);
         if (!empty($bioNote)) {
-            $contributorNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'BiographicalNote', htmlspecialchars(PKPString::html2text($bioNote), ENT_COMPAT, 'UTF-8')));
+            $contributorNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'BiographicalNote', htmlspecialchars(PKPString::html2text($bioNote), ENT_COMPAT, 'UTF-8')));
         }
         return $contributorNode;
     }
@@ -543,20 +542,20 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
      */
     public function createSubjectNode(DOMDocument $doc, string $subjectSchemeId, string $subjectHeadingOrCode, ?string $subjectSchemeName = null): DOMElement
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $subjectNode = $doc->createElementNS($deployment->getNamespace(), 'Subject');
 
         // Subject Scheme Identifier
-        $subjectNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SubjectSchemeIdentifier', $subjectSchemeId));
+        $subjectNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'SubjectSchemeIdentifier', $subjectSchemeId));
         if (is_null($subjectSchemeName)) {
             // Subject Heading
-            $subjectNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SubjectHeadingText', htmlspecialchars($subjectHeadingOrCode, ENT_COMPAT, 'UTF-8')));
+            $subjectNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'SubjectHeadingText', htmlspecialchars($subjectHeadingOrCode, ENT_COMPAT, 'UTF-8')));
         } else {
             // Subject Scheme Name
-            $subjectNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SubjectSchemeName', htmlspecialchars($subjectSchemeName, ENT_COMPAT, 'UTF-8')));
+            $subjectNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'SubjectSchemeName', htmlspecialchars($subjectSchemeName, ENT_COMPAT, 'UTF-8')));
             // Subject Code
-            $subjectNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'SubjectCode', htmlspecialchars($subjectHeadingOrCode, ENT_COMPAT, 'UTF-8')));
+            $subjectNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'SubjectCode', htmlspecialchars($subjectHeadingOrCode, ENT_COMPAT, 'UTF-8')));
         }
         return $subjectNode;
     }
@@ -566,7 +565,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
      */
     public function appendAsCrawledCollectionNodes(DOMDocument $doc, DOMElement $articleNode, Submission $article, array $galleys): void
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
         $request = Application::get()->getRequest();
@@ -579,7 +578,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true, '');
             $iParadigmsItemNode = $doc->createElementNS($deployment->getNamespace(), 'Item');
             $iParadigmsItemNode->setAttribute('crawler', 'iParadigms');
-            $iParadigmsItemNode->appendChild($node = $doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL)));
+            $iParadigmsItemNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'Resource', htmlspecialchars($resourceURL)));
             $crawlerBasedCollectionNode->appendChild($iParadigmsItemNode);
         }
         $articleNode->appendChild($crawlerBasedCollectionNode);
@@ -590,7 +589,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
      */
     public function appendTextMiningCollectionNodes(DOMDocument $doc, DOMElement $articleNode, Submission $article, array $galleys): void
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
         $request = Application::get()->getRequest();
@@ -601,7 +600,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
             $submissionFileId = $galley->getData('submissionFileId');
             if ($submissionFileId && $galleyFile = Repo::submissionFile()->get($submissionFileId)) {
                 $mimeType = $galleyFile->getData('mimetype');
-                if (strpos($mimeType, 'audio') === false && strpos($mimeType, 'video') === false) {
+                if (!str_contains($mimeType, 'audio') && !str_contains($mimeType, 'video')) {
                     $urlPath = [$article->getBestId(), $galley->getBestGalleyId()];
                     $dispatcher = $this->getDispatcher($request);
                     $resourceURL = $dispatcher->url($request, Application::ROUTE_PAGE, $context->getPath(), 'article', 'download', $urlPath, null, null, true, '');
@@ -623,7 +622,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
      */
     public function appendCitationListNodes(DOMDocument $doc, DOMElement $contentItemNode, string $pubObjectDoi, array $parsedCitations): void
     {
-        /** @var PKPNativeImportExportDeployment $deployment */
+        /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
         $medraCitationNamespace = 'http://www.medra.org/DOIMetadata/2.0/Citations';
         $citationListNode = $doc->createElementNS($deployment->getNamespace(), 'cl:CitationList');
