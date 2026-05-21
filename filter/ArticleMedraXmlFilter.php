@@ -459,7 +459,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter
         }
         // Add citation list (unstructured)
         $parsedCitations = $article->getCurrentPublication()->getData('citations');
-        if (!empty($parsedCitations)) {
+        if ($parsedCitations?->isNotEmpty()) {
             $this->appendCitationListNodes($doc, $contentItemNode, $pubObjectDoi, $parsedCitations);
         }
 
