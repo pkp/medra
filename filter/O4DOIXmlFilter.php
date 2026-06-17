@@ -19,6 +19,7 @@ use APP\core\Request;
 use APP\issue\Issue;
 use APP\plugins\DOIPubIdExportPlugin;
 use APP\plugins\generic\medra\MedraExportDeployment;
+use APP\publication\Publication;
 use APP\submission\Submission;
 use DOMDocument;
 use DOMElement;
@@ -170,10 +171,11 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
 
     /**
      * Generate O4DOI serial publication node.
+     * Uses the journal identity stamped on the given issue or publication, if any.
      *
      * @param ?string $epubFormat O4DOI_EPUB_FORMAT_*
      */
-    public function createSerialPublicationNode(DOMDocument $doc, array $journalLocalePrecedence, ?string $epubFormat = null): DOMElement
+    public function createSerialPublicationNode(DOMDocument $doc, array $journalLocalePrecedence, ?string $epubFormat = null, Issue|Publication|null $pubObject = null): DOMElement
     {
         /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -181,12 +183,13 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         $plugin = $deployment->getPlugin();
         $serialPublicationNode = $doc->createElementNS($deployment->getNamespace(), 'SerialPublication');
         // Serial Work (mandatory)
-        $serialPublicationNode->appendChild($this->createSerialWorkNode($doc, $journalLocalePrecedence));
+        $serialPublicationNode->appendChild($this->createSerialWorkNode($doc, $journalLocalePrecedence, $pubObject));
         // Electronic Serial Version
-        $onlineIssn = $context->getData('onlineIssn') ?? '';
+        $onlineIssn = ($pubObject ? $pubObject->getOnlineIssn($context) : $context->getData('onlineIssn')) ?? '';
         $serialPublicationNode->appendChild($this->createSerialVersionNode($doc, $onlineIssn, self::O4DOI_PRODUCT_FORM_ELECTRONIC, $epubFormat));
         // Print Serial Version
-        if (($printIssn = $context->getData('printIssn')) && $this->isWork($context, $plugin)) {
+        $printIssn = $pubObject ? $pubObject->getPrintIssn($context) : $context->getData('printIssn');
+        if ($printIssn && $this->isWork($context, $plugin)) {
             $serialPublicationNode->appendChild($this->createSerialVersionNode($doc, $printIssn, self::O4DOI_PRODUCT_FORM_PRINT));
         }
         return $serialPublicationNode;
@@ -194,8 +197,9 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
 
     /**
      * Generate O4DOI serial work node.
+     * Uses the journal identity stamped on the given issue or publication, if any.
      */
-    public function createSerialWorkNode(DOMDocument $doc, array $journalLocalePrecedence): DOMElement
+    public function createSerialWorkNode(DOMDocument $doc, array $journalLocalePrecedence, Issue|Publication|null $pubObject = null): DOMElement
     {
         /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -203,13 +207,14 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         $plugin = $deployment->getPlugin();
         $serialWorkNode = $doc->createElementNS($deployment->getNamespace(), 'SerialWork');
         // Title (mandatory)
-        $journalTitles = $this->getTranslationsByPrecedence($context->getName(), $journalLocalePrecedence);
+        $contextNames = ($pubObject?->getData('contextName')) ?: $context->getName();
+        $journalTitles = $this->getTranslationsByPrecedence($contextNames, $journalLocalePrecedence);
         assert(!empty($journalTitles));
         foreach ($journalTitles as $locale => $journalTitle) {
             $serialWorkNode->appendChild($this->createTitleNode($doc, $locale, $journalTitle, self::O4DOI_TITLE_TYPE_FULL));
         }
         // Publisher
-        $serialWorkNode->appendChild($this->createPublisherNode($doc, $journalLocalePrecedence));
+        $serialWorkNode->appendChild($this->createPublisherNode($doc, $journalLocalePrecedence, $pubObject));
         // Country of Publication (mandatory)
         $serialWorkNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'CountryOfPublication', htmlspecialchars($plugin->getSetting($context->getId(), 'publicationCountry'), ENT_COMPAT, 'UTF-8')));
         return $serialWorkNode;
@@ -261,8 +266,9 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
 
     /**
      * Create a publisher node.
+     * Uses the journal identity stamped on the given issue or publication, if any.
      */
-    public function createPublisherNode(DOMDocument $doc, array $journalLocalePrecedence): DOMElement
+    public function createPublisherNode(DOMDocument $doc, array $journalLocalePrecedence, Issue|Publication|null $pubObject = null): DOMElement
     {
         /** @var MedraExportDeployment $deployment */
         $deployment = $this->getDeployment();
@@ -271,11 +277,12 @@ abstract class O4DOIXmlFilter extends NativeExportFilter
         // Publishing role (mandatory)
         $publisherNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'PublishingRole', self::O4DOI_PUBLISHING_ROLE_PUBLISHER));
         // Publisher name (mandatory)
-        $publisher = $context->getData('publisherInstitution');
+        $publisher = $pubObject ? $pubObject->getPublisher($context) : $context->getData('publisherInstitution');
         if (empty($publisher)) {
             // Use the journal title if no publisher is set.
             // This corresponds to the logic implemented for OAI interfaces, too.
-            $publisher = $this->getPrimaryTranslation($context->getName(null), $journalLocalePrecedence);
+            $contextNames = ($pubObject?->getData('contextName')) ?: $context->getName(null);
+            $publisher = $this->getPrimaryTranslation($contextNames, $journalLocalePrecedence);
         }
         assert(!empty($publisher));
         $publisherNode->appendChild($doc->createElementNS($deployment->getNamespace(), 'PublisherName', htmlspecialchars($publisher, ENT_COMPAT, 'UTF-8')));
