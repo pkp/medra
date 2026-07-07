@@ -167,6 +167,22 @@ class MedraPlugin extends GenericPlugin implements IDoiRegistrationAgency
     }
 
     /**
+     * @copyDoc IDoiRegistrationAgency::exportPeerReviews()
+     */
+    public function exportPeerReviews(array $reviewAssignments, Context $context): array
+    {
+        return [];
+    }
+
+    /**
+     * @copyDoc IDoiRegistrationAgency::depositPeerReviews()
+     */
+    public function depositPeerReviews(array $peerReviews, Context $context): array
+    {
+        return [];
+    }
+
+    /**
      * Add properties for mEDRA to the DOI entity for storage in the database.
      *
      * @param string $hookName Schema::get::doi
