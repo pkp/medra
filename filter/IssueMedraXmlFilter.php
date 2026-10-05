@@ -142,7 +142,7 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter
         $journalLocalePrecedence = $objectLocalePrecedence = $this->getObjectLocalePrecedence($context, null, null);
 
         // Serial Publication (mandatory)
-        $issueNode->appendChild($this->createSerialPublicationNode($doc, $journalLocalePrecedence, self::O4DOI_EPUB_FORMAT_HTML));
+        $issueNode->appendChild($this->createSerialPublicationNode($doc, $journalLocalePrecedence, self::O4DOI_EPUB_FORMAT_HTML, $pubObject));
 
         // Journal Issue (mandatory)
         $issueId = $pubObject->getId();
@@ -226,7 +226,8 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter
             break;
         }
         if (empty($localizedTitle)) {
-            $localizedTitles = $this->getTranslationsByPrecedence($context->getName(null), $journalLocalePrecedence);
+            $contextNames = ($issue->getData('contextName')) ?: $context->getName(null);
+            $localizedTitles = $this->getTranslationsByPrecedence($contextNames, $journalLocalePrecedence);
             // Retrieve the first key/value pair...
             foreach ($localizedTitles as $locale => $localizedTitle) {
                 break;
